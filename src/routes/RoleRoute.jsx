@@ -9,11 +9,11 @@ export default function RoleRoute({
     children
 }) {
 
-    const { user } = useSelector(
+    const { platformRoles } = useSelector(
         (state) => state.auth
     );
 
-    const hasRole = user?.roles?.some(
+    const hasRole = platformRoles?.some(
         (role) => allowedRoles.includes(role)
     );
 

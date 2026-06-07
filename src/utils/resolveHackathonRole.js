@@ -1,8 +1,6 @@
 // src/utils/resolveHackathonRole.js
 
-import {
-    hackathonMembers
-} from "../mock/hackathonMembers";
+import { getDemoState } from "../services/demoStore";
 
 export function resolveHackathonRole(
     hackathonId,
@@ -10,7 +8,7 @@ export function resolveHackathonRole(
 ) {
 
     const membership =
-        hackathonMembers.find(
+        getDemoState().hackathonMembers.find(
             (member) =>
                 member.hackathonId === hackathonId &&
                 member.userId === userId

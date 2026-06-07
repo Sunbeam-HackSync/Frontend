@@ -30,6 +30,8 @@ import AuthInput from "../components/AuthInput";
 
 import AuthSideContent from "../components/AuthSideContent";
 
+import { getDemoState } from "../../../services/demoStore";
+
 export default function LoginPage() {
 
     const dispatch = useDispatch();
@@ -69,7 +71,19 @@ export default function LoginPage() {
                 navigate("/admin");
             }else {
 
-                navigate("/hackathons");
+                const demoState = getDemoState();
+                const membership = demoState.hackathonMembers.find(
+                    (item) => item.userId === authData.user.id && item.status !== "REMOVED"
+                );
+                const hackathon = demoState.hackathons.find(
+                    (item) => item.id === membership?.hackathonId
+                );
+
+                navigate(
+                    hackathon
+                        ? `/workspace/${hackathon.slug}/overview`
+                        : "/hackathons"
+                );
             }
 
         }

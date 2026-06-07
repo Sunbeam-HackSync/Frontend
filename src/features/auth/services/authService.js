@@ -13,7 +13,17 @@ function initializeUsers() {
 
   if (!existingUsers) {
     localStorage.setItem(USERS_KEY, JSON.stringify(mockUsers));
+    return;
   }
+
+  const users = JSON.parse(existingUsers);
+  const userIds = new Set(users.map((user) => user.id));
+  const mergedUsers = [
+    ...users,
+    ...mockUsers.filter((user) => !userIds.has(user.id)),
+  ];
+
+  localStorage.setItem(USERS_KEY, JSON.stringify(mergedUsers));
 }
 
 initializeUsers();
@@ -43,6 +53,18 @@ export async function registerUser(userData) {
     email: userData.email,
 
     password: userData.password,
+
+    avatarUrl: "",
+
+    bio: "New HackForge member ready to join hackathons.",
+
+    githubUrl: "",
+
+    linkedinUrl: "",
+
+    portfolioUrl: "",
+
+    techStack: [],
   };
 
   users.push(newUser);
@@ -74,6 +96,16 @@ export async function loginUser(email, password) {
       fullName: user.fullName,
 
       email: user.email,
+
+      bio: user.bio,
+
+      githubUrl: user.githubUrl,
+
+      linkedinUrl: user.linkedinUrl,
+
+      portfolioUrl: user.portfolioUrl,
+
+      techStack: user.techStack || [],
     },
 
     platformRoles: userPlatformRoles,

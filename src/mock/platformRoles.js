@@ -1,11 +1,5 @@
 // src/features/auth/services/platformRoles.js
 
-export const platformRoles = [
+import { seedPlatformRoles } from "./demoData";
 
-    {
-        userId: "user-1",
-
-        role: "SUPER_ADMIN"
-    }
-
-];
+export const platformRoles = seedPlatformRoles;

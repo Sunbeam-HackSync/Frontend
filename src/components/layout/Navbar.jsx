@@ -11,11 +11,17 @@ import Container from "../common/Container";
 import Button from "../ui/Button";
 
 import { useNavigate } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../features/auth/redux/authSlice";
+import { logoutUser } from "../../features/auth/services/authService";
+import { getDemoState } from "../../services/demoStore";
 
 export default function Navbar() {
 
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { isAuthenticated, user, platformRoles } = useSelector((state) => state.auth);
 
     const navLinks = [
         {
@@ -31,6 +37,29 @@ export default function Navbar() {
             path: "/hackathons"
         }
     ];
+
+    function goToDashboard() {
+        if (platformRoles.includes("SUPER_ADMIN")) {
+            navigate("/admin");
+            return;
+        }
+
+        const demoState = getDemoState();
+        const membership = demoState.hackathonMembers.find(
+            (item) => item.userId === user?.id && item.status !== "REMOVED"
+        );
+        const hackathon = demoState.hackathons.find(
+            (item) => item.id === membership?.hackathonId
+        );
+
+        navigate(hackathon ? `/workspace/${hackathon.slug}/overview` : "/hackathons");
+    }
+
+    function handleLogout() {
+        logoutUser();
+        dispatch(logout());
+        navigate("/");
+    }
 
     return (
         <header
@@ -108,13 +137,27 @@ export default function Navbar() {
                         "
                     >
 
-                        <Button variant="secondary" onClick={() => navigate("/login")}>
-                            Login
-                        </Button>
+                        {isAuthenticated ? (
+                            <>
+                                <Button variant="secondary" onClick={goToDashboard}>
+                                    Dashboard
+                                </Button>
 
-                        <Button onClick={() => navigate("/register")}>
-                            Get Started
-                        </Button>
+                                <Button onClick={handleLogout}>
+                                    Logout
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button variant="secondary" onClick={() => navigate("/login")}>
+                                    Login
+                                </Button>
+
+                                <Button onClick={() => navigate("/register")}>
+                                    Get Started
+                                </Button>
+                            </>
+                        )}
 
                     </div>
 
@@ -181,13 +224,27 @@ export default function Navbar() {
                         {/* Mobile Buttons */}
                         <div className="flex flex-col gap-3 pt-2">
 
-                            <Button variant="secondary" onClick={() => navigate("/login")}>
-                                Login
-                            </Button>
+                            {isAuthenticated ? (
+                                <>
+                                    <Button variant="secondary" onClick={goToDashboard}>
+                                        Dashboard
+                                    </Button>
 
-                            <Button onClick={() => navigate("/register")}   >
-                                Get Started
-                            </Button>
+                                    <Button onClick={handleLogout}>
+                                        Logout
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Button variant="secondary" onClick={() => navigate("/login")}>
+                                        Login
+                                    </Button>
+
+                                    <Button onClick={() => navigate("/register")}   >
+                                        Get Started
+                                    </Button>
+                                </>
+                            )}
 
                         </div>
 

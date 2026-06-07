@@ -1,29 +1,5 @@
 // src/mock/hackathonMembers.js
 
-export const hackathonMembers = [
+import { seedHackathonMembers } from "./demoData";
 
-    {
-        hackathonId: "hack-1",
-
-        userId: "user-2",
-
-        role: "ORGANIZER"
-    },
-
-    {
-        hackathonId: "hack-1",
-
-        userId: "user-3",
-
-        role: "PARTICIPANT"
-    },
-
-    {
-        hackathonId: "hack-2",
-
-        userId: "user-2",
-
-        role: "JUDGE"
-    }
-
-];
+export const hackathonMembers = seedHackathonMembers;

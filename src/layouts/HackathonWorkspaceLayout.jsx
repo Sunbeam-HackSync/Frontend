@@ -24,9 +24,9 @@ export default function HackathonWorkspaceLayout({
                 hackathon={hackathon}
             />
 
-            <main className="flex-1 p-8">
+            <main className="flex-1 p-5 md:p-8">
 
-                <Outlet />
+                <Outlet context={{ role, hackathon }} />
 
             </main>
 

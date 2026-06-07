@@ -4,9 +4,7 @@ import { useMemo } from "react";
 
 import { useSelector } from "react-redux";
 
-import {
-    hackathonMembers
-} from "../mock/hackathonMembers";
+import { getDemoState } from "../services/demoStore";
 
 export default function useHackathonRole(
     hackathonId
@@ -21,7 +19,7 @@ export default function useHackathonRole(
         if (!user) return null;
 
         const membership =
-            hackathonMembers.find(
+            getDemoState().hackathonMembers.find(
                 (member) =>
                     member.hackathonId === hackathonId &&
                     member.userId === user.id

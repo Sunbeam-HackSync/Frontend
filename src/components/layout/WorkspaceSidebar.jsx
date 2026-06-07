@@ -1,6 +1,6 @@
 // src/components/layout/WorkspaceSidebar.jsx
 
-import { Link } from "react-router";
+import { NavLink } from "react-router";
 
 export default function WorkspaceSidebar({
     role,
@@ -40,6 +40,10 @@ export default function WorkspaceSidebar({
             {
                 name: "Submission",
                 path: "submission"
+            },
+            {
+                name: "Help",
+                path: "help"
             }
         ],
 
@@ -96,24 +100,24 @@ export default function WorkspaceSidebar({
                 {
                     links.map((link) => (
 
-                        <Link
+                        <NavLink
                             key={link.name}
                             to={link.path}
-                            className="
+                            className={({ isActive }) => `
                                 block
-                                rounded-xl
+                                rounded-lg
                                 px-4
                                 py-3
-                                text-slate-300
-                                hover:bg-slate-800
-                                hover:text-white
+                                ${isActive
+                                    ? "bg-sky-500/10 text-sky-200 border border-sky-500/20"
+                                    : "text-slate-300 hover:bg-slate-800 hover:text-white"}
                                 transition
-                            "
+                            `}
                         >
 
                             {link.name}
 
-                        </Link>
+                        </NavLink>
                     ))
                 }
 
