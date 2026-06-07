@@ -1,4 +1,4 @@
-// 
+// src/components/landing/CTASection.jsx
 
 import Container from "../common/Container";
 

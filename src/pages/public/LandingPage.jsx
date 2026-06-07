@@ -19,8 +19,6 @@ export default function LandingPage() {
         <>
             <HeroSection />
 
-            <SponsorsSection />
-
             <FeaturesSection />
 
             <RolesSection />
@@ -30,6 +28,8 @@ export default function LandingPage() {
             <TestimonialsSection />
 
             <CTASection />
+
+            <SponsorsSection />
         </>
     );
 }

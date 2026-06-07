@@ -1,3 +1,5 @@
+// src/components/landing/TestimonialsSection.jsx
+
 import Container from "../common/Container";
 
 import SectionTitle from "../common/SectionTitle";

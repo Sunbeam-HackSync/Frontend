@@ -9,6 +9,12 @@ import AboutPage from "../pages/public/AboutPage";
 
 import NotFound from "../pages/shared/NotFound";
 
+import LoginPage from "../features/auth/pages/LoginPage";
+
+import RegisterPage from "../features/auth/pages/RegisterPage";
+
+import AuthLayout from '../layouts/AuthLayout';
+
 const router = createBrowserRouter([
     {
         path: "/",
@@ -22,6 +28,20 @@ const router = createBrowserRouter([
             {
                 path: "about",
                 element: <AboutPage />
+            }
+        ]
+    },
+    {
+        path: "/",
+        element: <AuthLayout />,
+        children: [
+            {
+                path: "login",
+                element: <LoginPage />
+            },
+            {
+                path: "register",
+                element: <RegisterPage />
             }
         ]
     }

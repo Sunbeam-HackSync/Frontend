@@ -1,3 +1,5 @@
+// src/components/landing/SponsorsSection.jsx
+
 import Container from "../common/Container";
 
 const sponsors = [
@@ -10,7 +12,7 @@ const sponsors = [
 
 export default function SponsorsSection() {
     return (
-        <section className="py-16 border-y border-slate-800">
+        <section className="py-10 border-y border-slate-800">
 
             <Container>
 

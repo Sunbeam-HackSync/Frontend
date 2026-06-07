@@ -1,3 +1,5 @@
+// src/components/layout/Navbar.jsx
+
 import { useState } from "react";
 
 import { Link } from "react-router";
@@ -8,9 +10,12 @@ import Container from "../common/Container";
 
 import Button from "../ui/Button";
 
+import { useNavigate } from "react-router";
+
 export default function Navbar() {
 
     const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
     const navLinks = [
         {
@@ -103,11 +108,11 @@ export default function Navbar() {
                         "
                     >
 
-                        <Button variant="secondary">
+                        <Button variant="secondary" onClick={() => navigate("/login")}>
                             Login
                         </Button>
 
-                        <Button>
+                        <Button onClick={() => navigate("/register")}>
                             Get Started
                         </Button>
 
@@ -176,11 +181,11 @@ export default function Navbar() {
                         {/* Mobile Buttons */}
                         <div className="flex flex-col gap-3 pt-2">
 
-                            <Button variant="secondary">
+                            <Button variant="secondary" onClick={() => navigate("/login")}>
                                 Login
                             </Button>
 
-                            <Button>
+                            <Button onClick={() => navigate("/register")}   >
                                 Get Started
                             </Button>
 
