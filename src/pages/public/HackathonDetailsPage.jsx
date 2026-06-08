@@ -4,9 +4,9 @@ import { FaCalendarAlt, FaClock, FaUsers } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router";
 import { useSelector } from "react-redux";
 
-import Badge from "../../components/dashboard/Badge";
-import Panel from "../../components/dashboard/Panel";
-import StatCard from "../../components/dashboard/StatCard";
+import Badge from "../../features/hackathons/components/Badge";
+import Panel from "../../features/hackathons/components/Panel";
+import StatCard from "../../features/hackathons/components/StatCard";
 import Button from "../../components/ui/Button";
 import Container from "../../components/common/Container";
 import useDemoData from "../../hooks/useDemoData";

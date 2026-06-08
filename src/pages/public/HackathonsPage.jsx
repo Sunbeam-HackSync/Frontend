@@ -3,9 +3,9 @@ import { useMemo, useState } from "react";
 import { FaSearch, FaUsers } from "react-icons/fa";
 import { Link } from "react-router";
 
-import Badge from "../../components/dashboard/Badge";
-import PageHeader from "../../components/dashboard/PageHeader";
-import StatCard from "../../components/dashboard/StatCard";
+import Badge from "../../features/hackathons/components/Badge";
+import PageHeader from "../../features/hackathons/components/PageHeader";
+import StatCard from "../../features/hackathons/components/StatCard";
 import Button from "../../components/ui/Button";
 import Container from "../../components/common/Container";
 import useDemoData from "../../hooks/useDemoData";

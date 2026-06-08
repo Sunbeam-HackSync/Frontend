@@ -16,22 +16,34 @@ import LoginPage from "../features/auth/pages/LoginPage";
 import RegisterPage from "../features/auth/pages/RegisterPage";
 
 import AuthLayout from '../layouts/AuthLayout';
+
 import ProtectedRoute from "./ProtectedRoute";
+
 import AdminRoute from "./AdminRoute";
+
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import HackathonWorkspacePage from "../pages/workspace/HackathonWorkspacePage";
-import {
-    JudgeAssignedProjectsPage,
-    JudgeEvaluationPage,
-    MentorHelpQueuePage,
-    OrganizerAnnouncementsPage,
-    OrganizerParticipantsPage,
-    OrganizerSubmissionsPage,
-    ParticipantHelpPage,
-    ParticipantSubmissionPage,
-    ParticipantTeamPage,
-    WorkspaceOverviewPage,
-} from "../pages/workspace/WorkspacePages";
+
+import HackathonWorkspacePage from "../features/hackathons/pages/HackathonWorkspacePage";
+
+import { JudgeAssignedProjectsPage } from "../features/hackathons/pages/JudgeAssignedProjectsPage";
+
+import { JudgeEvaluationPage } from "../features/hackathons/pages/JudgeEvaluationPage";
+
+import { MentorHelpQueuePage } from "../features/hackathons/pages/MentorHelpQueuePage";
+
+import {OrganizerAnnouncementsPage} from "../features/hackathons/pages/OrganizerAnnouncementsPage"; 
+
+import { OrganizerParticipantsPage } from "../features/hackathons/pages/OrganizerParticipantsPage";
+
+import { OrganizerSubmissionsPage } from "../features/hackathons/pages/OrganizerSubmissionsPage";
+
+import { ParticipantHelpPage } from "../features/hackathons/pages/ParticipantHelpPage";
+
+import { ParticipantSubmissionPage } from "../features/hackathons/pages/ParticipantSubmissionPage";
+
+import { ParticipantTeamPage } from "../features/hackathons/pages/ParticipantTeamPage";
+
+import { WorkspaceOverviewPage } from "../features/hackathons/pages/WorkspaceOverviewPage";
 
 const router = createBrowserRouter([
     {

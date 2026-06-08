@@ -2,8 +2,18 @@
 
 import { Outlet } from "react-router";
 
+import { useSelector } from "react-redux";
+
+import { Navigate } from "react-router";
+
 
 export default function AuthLayout() {
+    const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+    if (isAuthenticated) {
+        return <Navigate to="/" replace />;
+    }
+
     return (
         <div
             className="

@@ -2,12 +2,12 @@
 import { useParams } from "react-router";
 
 import useHackathonRole
-from "../../hooks/useHackathonRole";
+from "../../../hooks/useHackathonRole";
 
 import HackathonWorkspaceLayout
-from "../../layouts/HackathonWorkspaceLayout";
+from "../../../layouts/HackathonWorkspaceLayout";
 
-import useDemoData from "../../hooks/useDemoData";
+import useDemoData from "../../../hooks/useDemoData";
 
 export default function HackathonWorkspacePage() {
 
