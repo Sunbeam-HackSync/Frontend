@@ -45,6 +45,8 @@ import { ParticipantTeamPage } from "../features/hackathons/pages/ParticipantTea
 
 import { WorkspaceOverviewPage } from "../features/hackathons/pages/WorkspaceOverviewPage";
 
+import HostHackathonPage from "../features/hackathons/pages/HostHackathonPage";
+
 const router = createBrowserRouter([
     {
         path: "/",
@@ -89,6 +91,14 @@ const router = createBrowserRouter([
             <AdminRoute>
                 <AdminDashboard />
             </AdminRoute>
+        )
+    },
+    {
+        path: "/host-hackathon",
+        element: (
+            <ProtectedRoute>
+                <HostHackathonPage />
+            </ProtectedRoute>
         )
     },
     {

@@ -82,7 +82,7 @@ export default function Navbar() {
                         flex
                         items-center
                         justify-between
-                        h-16
+                        h-18
                     "
                 >
 
@@ -90,7 +90,7 @@ export default function Navbar() {
                     <Link
                         to="/"
                         className="
-                            text-2xl
+                            text-3xl
                             font-bold
                             tracking-wide
                         "
@@ -119,6 +119,7 @@ export default function Navbar() {
                                     text-slate-300
                                     hover:text-white
                                     transition
+                                    text-xl
                                 "
                             >
                                 {link.name}

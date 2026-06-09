@@ -6,7 +6,7 @@ function clone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
-function createId(prefix) {
+export function createId(prefix) {
   return `${prefix}-${crypto.randomUUID()}`;
 }
 

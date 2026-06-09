@@ -4,7 +4,10 @@ import Container from "../common/Container";
 
 import Button from "../ui/Button";
 
+import { useNavigate } from "react-router";
+
 export default function CTASection() {
+    const navigate = useNavigate();
     return (
         <section className="py-24">
 
@@ -78,6 +81,9 @@ export default function CTASection() {
                             <Button
                                 variant="secondary"
                                 className="bg-white/10 border-white/20"
+                                onClick={() => {
+                                    navigate("/hackathons");
+                                }}
                             >
                                 Explore Events
                             </Button>
