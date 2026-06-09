@@ -66,7 +66,7 @@ export default function RegisterPage() {
 
                 <AuthCard
                     title="Create Account"
-                    subtitle="Join HackForge and start building amazing projects."
+                    subtitle="Join HackSync and start building amazing projects."
                 >
 
                     <form
