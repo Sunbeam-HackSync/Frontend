@@ -10,7 +10,7 @@ const testimonials = [
         name: "Rahul Sharma",
         role: "Hackathon Organizer",
         feedback:
-            "HackForge completely transformed the way we manage hackathons and judging workflows."
+            "HackSync completely transformed the way we manage hackathons and judging workflows."
     },
     {
         id: 2,
@@ -38,7 +38,7 @@ export default function TestimonialsSection() {
                     badge="Community Feedback"
                     title="Loved By Developers & Organizers"
                     description="
-                        Thousands of innovators trust HackForge
+                        Thousands of innovators trust HackSync
                         to run and participate in world-class hackathons.
                     "
                 />

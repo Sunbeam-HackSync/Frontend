@@ -97,7 +97,7 @@ export default function Navbar() {
                     >
                         Hack
                         <span className="text-indigo-500">
-                            Forge
+                            Sync
                         </span>
                     </Link>
 

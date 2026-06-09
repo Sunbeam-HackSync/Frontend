@@ -42,7 +42,7 @@ export default function AuthSideContent() {
                     <Link to="/">
                         Hack
                         <span className="text-indigo-500">
-                            Forge
+                            Sync
                         </span>
                     </Link>
                 </h1>

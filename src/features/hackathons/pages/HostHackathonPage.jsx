@@ -1,3 +1,4 @@
+
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 
@@ -72,7 +73,7 @@ export default function HostHackathonPage() {
           <div className="mb-12">
             <SectionTitle>Host a Hackathon</SectionTitle>
             <p className="text-slate-400 mt-4">
-              Create and manage your own hackathon on HackForge. Follow the steps below to get started.
+              Create and manage your own hackathon on HackSync. Follow the steps below to get started.
             </p>
           </div>
 

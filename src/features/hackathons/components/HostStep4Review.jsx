@@ -142,7 +142,7 @@ export default function HostStep4Review({ onSubmit }) {
         </Button>
 
         <p className="text-xs text-slate-400 text-center">
-          By submitting, you agree to HackForge's Terms of Service and Community Guidelines
+          By submitting, you agree to HackSync's Terms of Service and Community Guidelines
         </p>
       </div>
     </div>
