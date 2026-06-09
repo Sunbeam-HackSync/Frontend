@@ -20,11 +20,11 @@ export default function Footer() {
                 >
 
                     <h2 className="text-xl font-bold">
-                        Hack<span className="text-indigo-500">Forge</span>
+                        Hack<span className="text-indigo-500">Sync</span>
                     </h2>
 
                     <p className="text-slate-400 text-sm">
-                        © 2026 HackForge. All rights reserved.
+                        © 2026 HackSync. All rights reserved.
                     </p>
 
                 </div>
