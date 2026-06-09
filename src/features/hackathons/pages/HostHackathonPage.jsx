@@ -70,7 +70,8 @@ export default function HostHackathonPage() {
       <Container>
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="mb-12">
+          <h2 className="text-3xl font-bold">Host a Hackathon</h2>
+          <div className="mb-12"> 
             <SectionTitle>Host a Hackathon</SectionTitle>
             <p className="text-slate-400 mt-4">
               Create and manage your own hackathon on HackSync. Follow the steps below to get started.
