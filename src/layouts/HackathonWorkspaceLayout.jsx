@@ -2,7 +2,7 @@
 
 import { Outlet } from "react-router";
 
-import WorkspaceSidebar from "../components/layout/WorkspaceSidebar";
+import WorkspaceSidebar from "../features/workspace/components/WorkspaceSidebar";
 
 export default function HackathonWorkspaceLayout({
     role,

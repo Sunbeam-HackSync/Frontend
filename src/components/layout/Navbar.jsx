@@ -2,19 +2,17 @@
 
 import { useState } from "react";
 
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 import { FaBars, FaTimes } from "react-icons/fa";
 
 import Container from "../common/Container";
-
 import Button from "../ui/Button";
 
-import { useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/auth/redux/authSlice";
 import { logoutUser } from "../../features/auth/services/authService";
-import { getDemoState } from "../../services/demoStore";
+import { getRoleRedirectPath } from "../../utils/navigation";
 
 export default function Navbar() {
 
@@ -39,20 +37,7 @@ export default function Navbar() {
     ];
 
     function goToDashboard() {
-        if (platformRoles.includes("SUPER_ADMIN")) {
-            navigate("/admin");
-            return;
-        }
-
-        const demoState = getDemoState();
-        const membership = demoState.hackathonMembers.find(
-            (item) => item.userId === user?.id && item.status !== "REMOVED"
-        );
-        const hackathon = demoState.hackathons.find(
-            (item) => item.id === membership?.hackathonId
-        );
-
-        navigate(hackathon ? `/workspace/${hackathon.slug}/overview` : "/hackathons");
+        navigate(getRoleRedirectPath(platformRoles));
     }
 
     function handleLogout() {

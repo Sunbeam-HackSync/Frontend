@@ -2,7 +2,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import authReducer from '../features/auth/redux/authSlice';
-import hostReducer from '../features/hackathons/redux/hostSlice';
+import hostReducer from '../features/host/redux/hostSlice';
 
 export const store = configureStore({
   reducer: {

@@ -4,7 +4,7 @@ import Container from "../common/Container";
 
 import SectionTitle from "../common/SectionTitle";
 
-import { userRoles } from "../../mock/landingData";
+import { userRoles } from "../../constants/landingData";
 
 export default function RolesSection() {
     return (

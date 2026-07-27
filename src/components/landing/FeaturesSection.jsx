@@ -4,7 +4,7 @@ import SectionTitle from "../common/SectionTitle";
 
 import FeatureCard from "./FeatureCard";
 
-import { platformFeatures } from "../../mock/landingData";
+import { platformFeatures } from "../../constants/landingData";
 
 import Container from "../common/Container";
 

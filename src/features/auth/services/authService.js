@@ -1,127 +1,120 @@
 // src/features/auth/services/authService.js
 
-import { mockUsers } from "../../../mock/mockUsers";
+import api from "../../../services/api";
+import Cookies from "js-cookie";
 
-import { platformRoles } from "../../../mock/platformRoles";
+// ─── Token Utilities ──────────────────────────────────────────────────────────
 
-const USERS_KEY = "hackforge_users";
+function saveToken(token) {
+  Cookies.set("token", token, { expires: 7, sameSite: "strict" });
+}
 
-const AUTH_KEY = "hackforge_auth";
+export function clearToken() {
+  Cookies.remove("token");
+}
 
-function initializeUsers() {
-  const existingUsers = localStorage.getItem(USERS_KEY);
+/** Returns { token } if a token cookie exists, otherwise null. */
+export function getCurrentAuth() {
+  const token = Cookies.get("token");
+  return token ? { token } : null;
+}
 
-  if (!existingUsers) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(mockUsers));
-    return;
+/**
+ * Decode the JWT payload client-side WITHOUT signature verification.
+ * Use only for reading claims like email (sub), userId, role — never for security checks.
+ * Security is enforced server-side on every protected request.
+ */
+export function parseJwtPayload(token) {
+  try {
+    const base64 = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(atob(base64));
+    // Decoded shape: { role, userId, sub (email), iat, exp }
+  } catch {
+    return null;
   }
-
-  const users = JSON.parse(existingUsers);
-  const userIds = new Set(users.map((user) => user.id));
-  const mergedUsers = [
-    ...users,
-    ...mockUsers.filter((user) => !userIds.has(user.id)),
-  ];
-
-  localStorage.setItem(USERS_KEY, JSON.stringify(mergedUsers));
 }
 
-initializeUsers();
+/**
+ * Normalize backend role format { authority: "ROLE_X" } into a flat array.
+ * Produces both "ROLE_PARTICIPANT" and "PARTICIPANT" so any existing guard works.
+ */
+export function parsePlatformRoles(profile) {
+  if (!profile) return [];
+  const raw = profile.roles || (profile.role ? [profile.role] : []);
+  if (!Array.isArray(raw)) return [];
 
-export function getUsers() {
-  return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+  const result = new Set();
+  raw.forEach((item) => {
+    const str = typeof item === "string" ? item : (item?.authority || "");
+    if (!str) return;
+    result.add(str.toUpperCase());                       // e.g. "ROLE_PARTICIPANT"
+    result.add(str.replace(/^ROLE_/i, "").toUpperCase()); // e.g. "PARTICIPANT"
+  });
+  return Array.from(result);
 }
 
-export function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
+// ─── Auth API Calls ───────────────────────────────────────────────────────────
 
-export async function registerUser(userData) {
-  const users = getUsers();
-
-  const existingUser = users.find((user) => user.email === userData.email);
-
-  if (existingUser) {
-    throw new Error("Email already registered");
+export async function registerUser({ email, password, role }) {
+  try {
+    const response = await api.post("/auth/register", {
+      email,
+      password,
+      role: role || "PARTICIPANT",
+    });
+    return response.data.data; // { id, email, role, ... }
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Registration failed.");
   }
+}
 
-  const newUser = {
-    id: crypto.randomUUID(),
-
-    fullName: userData.fullName,
-
-    email: userData.email,
-
-    password: userData.password,
-
-    avatarUrl: "",
-
-    bio: "New HackForge member ready to join hackathons.",
-
-    githubUrl: "",
-
-    linkedinUrl: "",
-
-    portfolioUrl: "",
-
-    techStack: [],
-  };
-
-  users.push(newUser);
-
-  saveUsers(users);
-
-  return newUser;
+export async function verifyOtp(email, otpCode) {
+  try {
+    const response = await api.post("/auth/verify", { email, otpCode });
+    const token = response.data?.data?.token;
+    if (token) saveToken(token);
+    return response.data.data; // { token, expiresIn }
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "OTP verification failed.");
+  }
 }
 
 export async function loginUser(email, password) {
-  const users = getUsers();
-
-  const user = users.find(
-    (user) => user.email === email && user.password === password,
-  );
-
-  if (!user) {
-    throw new Error("Invalid email or password");
+  try {
+    const response = await api.post("/auth/login", { email, password });
+    const token = response.data?.data?.token;
+    if (token) saveToken(token);
+    return response.data.data; // { token, expiresIn }
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Invalid email or password.");
   }
-
-  const userPlatformRoles = platformRoles
-    .filter((item) => item.userId === user.id)
-    .map((item) => item.role);
-
-  const authData = {
-    user: {
-      id: user.id,
-
-      fullName: user.fullName,
-
-      email: user.email,
-
-      bio: user.bio,
-
-      githubUrl: user.githubUrl,
-
-      linkedinUrl: user.linkedinUrl,
-
-      portfolioUrl: user.portfolioUrl,
-
-      techStack: user.techStack || [],
-    },
-
-    platformRoles: userPlatformRoles,
-
-    token: crypto.randomUUID(),
-  };
-
-  localStorage.setItem(AUTH_KEY, JSON.stringify(authData));
-
-  return authData;
 }
 
-export function logoutUser() {
-  localStorage.removeItem(AUTH_KEY);
+/** Returns { username, roles } from the backend. */
+export async function fetchUserProfile() {
+  try {
+    const response = await api.get("/api/profiles/me");
+    return response.data?.data || response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch user profile.");
+  }
 }
 
-export function getCurrentAuth() {
-  return JSON.parse(localStorage.getItem(AUTH_KEY));
+export async function resendOtp(email) {
+  try {
+    await api.post("/auth/resend", { email });
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to resend OTP.");
+  }
+}
+
+export async function logoutUser() {
+  try {
+    await api.post("/auth/logout");
+  } catch (error) {
+    // Still clear local state even if server call fails
+    console.error("Logout error:", error);
+  } finally {
+    clearToken();
+  }
 }

@@ -22,7 +22,7 @@ export default function AdminRoute({
 
     const isAdmin =
         platformRoles.includes(
-            "SUPER_ADMIN"
+            "ADMIN"
         );
 
     if (!isAdmin) {

@@ -1,44 +1,53 @@
-import { useMemo } from "react";
-
+import { useEffect, useState } from "react";
 import { FaCalendarAlt, FaClock, FaUsers } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router";
 import { useSelector } from "react-redux";
 
-import Badge from "../../features/hackathons/components/Badge";
-import Panel from "../../features/hackathons/components/Panel";
-import StatCard from "../../features/hackathons/components/StatCard";
+import Badge from "../../features/workspace/components/Badge";
+import Panel from "../../features/workspace/components/Panel";
+import StatCard from "../../features/workspace/components/StatCard";
 import Button from "../../components/ui/Button";
 import Container from "../../components/common/Container";
-import useDemoData from "../../hooks/useDemoData";
-import {
-  getHackathonRole,
-  getRegistration,
-  registerForHackathon,
-} from "../../services/demoStore";
 import { formatDateTime, isPast } from "../../utils/formatters";
+import { getParticipantHackathonById } from "../../features/workspace/services/workspaceService";
 
 export default function HackathonDetailsPage() {
-  const { slug } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
-  const { state, commit } = useDemoData();
+  const { user, isAuthenticated, platformRoles } = useSelector((state) => state.auth);
+  
+  const [hackathon, setHackathon] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const hackathon = state.hackathons.find((item) => item.slug === slug);
+  useEffect(() => {
+    async function fetchHackathon() {
+      try {
+        setLoading(true);
+        const data = await getParticipantHackathonById(id);
+        setHackathon(data);
+      } catch (err) {
+        setError("Failed to load hackathon details.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchHackathon();
+  }, [id]);
 
-  const registration = useMemo(() => {
-    if (!hackathon || !user) return null;
-    return getRegistration(state, hackathon.id, user.id);
-  }, [hackathon, state, user]);
+  if (loading) {
+    return (
+      <Container className="py-20 text-center">
+        <p className="text-slate-400">Loading details...</p>
+      </Container>
+    );
+  }
 
-  const role = useMemo(() => {
-    if (!hackathon || !user) return null;
-    return getHackathonRole(state, hackathon.id, user.id);
-  }, [hackathon, state, user]);
-
-  if (!hackathon) {
+  if (error || !hackathon) {
     return (
       <Container className="py-20">
         <Panel title="Hackathon not found">
+          <p className="text-red-400 mb-4">{error}</p>
           <Link to="/hackathons">
             <Button>Back to Hackathons</Button>
           </Link>
@@ -47,26 +56,30 @@ export default function HackathonDetailsPage() {
     );
   }
 
+  // Assuming role implies access to workspace. In this case, we'd need to fetch user's registration status.
+  // For now, if they are participant or host, we might show "Open Workspace"
+  // Since we don't have a direct "get registration status" API, we will allow them to navigate if they are logged in.
+  const hasWorkspaceAccess = isAuthenticated && (platformRoles?.includes("PARTICIPANT") || platformRoles?.includes("HOST") || platformRoles?.includes("ADMIN"));
+
   function handleRegister() {
     if (!isAuthenticated) {
       navigate("/login");
       return;
     }
-
-    commit((draft) => registerForHackathon(draft, hackathon.id, user.id));
+    // TODO: Connect to proper Registration endpoint
+    // navigate to workspace or open create team modal
+    navigate(`/workspace/${hackathon.id}/overview`);
   }
 
-  const deadlinePassed = isPast(hackathon.registrationEnd);
+  const deadlinePassed = hackathon.registrationEnd ? isPast(hackathon.registrationEnd) : false;
 
   return (
     <section className="py-14">
       <Container>
         <div className="mb-8 rounded-lg border border-slate-800 bg-slate-900/60 p-6 md:p-8">
           <div className="mb-5 flex flex-wrap items-center gap-3">
-            <Badge>{hackathon.status}</Badge>
-            <Badge tone="slate">{hackathon.mode}</Badge>
-            {registration && <Badge>{registration.status}</Badge>}
-            {role && <Badge tone="purple">{role}</Badge>}
+            <Badge>{hackathon.status || "UNKNOWN"}</Badge>
+            <Badge tone="slate">{hackathon.mode || "ONLINE"}</Badge>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -79,7 +92,7 @@ export default function HackathonDetailsPage() {
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2">
-                {hackathon.tracks.map((track) => (
+                {hackathon.tracks?.map((track) => (
                   <Badge key={track} tone="blue">
                     {track}
                   </Badge>
@@ -89,26 +102,22 @@ export default function HackathonDetailsPage() {
 
             <div className="rounded-lg border border-slate-800 bg-slate-950 p-5">
               <p className="text-sm text-slate-400">Prize Pool</p>
-              <p className="mt-2 text-3xl font-bold text-white">{hackathon.prizePool}</p>
+              <p className="mt-2 text-3xl font-bold text-white">{hackathon.prizePool || "TBA"}</p>
               <p className="mt-4 text-sm text-slate-400">
                 Team size: {hackathon.minTeamSize}-{hackathon.maxTeamSize}
               </p>
 
-              {role ? (
-                <Link to={`/workspace/${hackathon.slug}/overview`} className="mt-5 block">
+              {hasWorkspaceAccess ? (
+                <Link to={`/workspace/${hackathon.id}/overview`} className="mt-5 block">
                   <Button className="w-full">Open Workspace</Button>
                 </Link>
               ) : (
                 <Button
                   className="mt-5 w-full"
-                  disabled={!!registration || deadlinePassed}
+                  disabled={deadlinePassed}
                   onClick={handleRegister}
                 >
-                  {registration
-                    ? `Registration ${registration.status.toLowerCase()}`
-                    : deadlinePassed
-                      ? "Registration Closed"
-                      : "Register Now"}
+                  {deadlinePassed ? "Registration Closed" : "Register Now"}
                 </Button>
               )}
             </div>
@@ -118,37 +127,39 @@ export default function HackathonDetailsPage() {
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           <StatCard
             label="Registration Window"
-            value={formatDateTime(hackathon.registrationEnd)}
+            value={hackathon.registrationEnd ? formatDateTime(hackathon.registrationEnd) : "N/A"}
             helper="Applications close at this timestamp"
             icon={FaCalendarAlt}
           />
           <StatCard
             label="Submission Deadline"
-            value={formatDateTime(hackathon.submissionEnd)}
+            value={hackathon.submissionEnd ? formatDateTime(hackathon.submissionEnd) : "N/A"}
             helper="Participants cannot submit after this"
             icon={FaClock}
           />
           <StatCard
             label="Max Participants"
-            value={hackathon.maxParticipants}
+            value={hackathon.maxParticipants || "Unlimited"}
             helper="Capacity configured by organizer"
             icon={FaUsers}
           />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Panel title="Rules">
-            <div className="space-y-3">
-              {hackathon.rules.map((rule) => (
-                <div
-                  key={rule}
-                  className="rounded-lg border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-300"
-                >
-                  {rule}
-                </div>
-              ))}
-            </div>
-          </Panel>
+          {hackathon.rules && hackathon.rules.length > 0 && (
+            <Panel title="Rules">
+              <div className="space-y-3">
+                {hackathon.rules.map((rule) => (
+                  <div
+                    key={rule}
+                    className="rounded-lg border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-slate-300"
+                  >
+                    {rule}
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          )}
 
           <Panel title="Timeline">
             <div className="space-y-3 text-sm">
@@ -165,7 +176,7 @@ export default function HackathonDetailsPage() {
                   className="flex justify-between gap-4 rounded-lg border border-slate-800 bg-slate-950 px-4 py-3 text-slate-300"
                 >
                   <span className="text-slate-500">{label}</span>
-                  <span>{formatDateTime(value)}</span>
+                  <span>{value ? formatDateTime(value) : "N/A"}</span>
                 </div>
               ))}
             </div>

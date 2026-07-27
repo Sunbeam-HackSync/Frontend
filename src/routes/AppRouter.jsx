@@ -1,160 +1,135 @@
-// /src/routes/AppRouter.jsx
+// src/routes/AppRouter.jsx
 
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 
 import PublicLayout from "../layouts/PublicLayout";
+import AuthLayout from "../layouts/AuthLayout";
 
+// ── Public pages ──────────────────────────────────────────────────────────────
 import LandingPage from "../pages/public/LandingPage";
 import AboutPage from "../pages/public/AboutPage";
 import HackathonsPage from "../pages/public/HackathonsPage";
 import HackathonDetailsPage from "../pages/public/HackathonDetailsPage";
-
 import NotFound from "../pages/shared/NotFound";
 
+// ── Auth pages ────────────────────────────────────────────────────────────────
 import LoginPage from "../features/auth/pages/LoginPage";
-
 import RegisterPage from "../features/auth/pages/RegisterPage";
 
-import AuthLayout from '../layouts/AuthLayout';
-
+// ── Route guards ──────────────────────────────────────────────────────────────
 import ProtectedRoute from "./ProtectedRoute";
-
+import PublicOnlyRoute from "./PublicOnlyRoute";
 import AdminRoute from "./AdminRoute";
+import RoleRoute from "./RoleRoute";
 
-import AdminDashboard from "../pages/admin/AdminDashboard";
+// ── Admin feature ─────────────────────────────────────────────────────────────
+import AdminDashboard from "../features/admin/pages/AdminDashboard";
 
-import HackathonWorkspacePage from "../features/hackathons/pages/HackathonWorkspacePage";
+// ── Host feature ──────────────────────────────────────────────────────────────
+import HostDashboardPage from "../features/host/pages/HostDashboardPage";
+import HostHackathonPage from "../features/host/pages/HostHackathonPage";
+import HostManagePage from "../features/host/pages/HostManagePage";
 
-import { JudgeAssignedProjectsPage } from "../features/hackathons/pages/JudgeAssignedProjectsPage";
-
-import { JudgeEvaluationPage } from "../features/hackathons/pages/JudgeEvaluationPage";
-
-import { MentorHelpQueuePage } from "../features/hackathons/pages/MentorHelpQueuePage";
-
-import {OrganizerAnnouncementsPage} from "../features/hackathons/pages/OrganizerAnnouncementsPage"; 
-
-import { OrganizerParticipantsPage } from "../features/hackathons/pages/OrganizerParticipantsPage";
-
-import { OrganizerSubmissionsPage } from "../features/hackathons/pages/OrganizerSubmissionsPage";
-
-import { ParticipantHelpPage } from "../features/hackathons/pages/ParticipantHelpPage";
-
-import { ParticipantSubmissionPage } from "../features/hackathons/pages/ParticipantSubmissionPage";
-
-import { ParticipantTeamPage } from "../features/hackathons/pages/ParticipantTeamPage";
-
-import { WorkspaceOverviewPage } from "../features/hackathons/pages/WorkspaceOverviewPage";
-
-import HostHackathonPage from "../features/hackathons/pages/HostHackathonPage";
+// ── Workspace feature (shared by all roles inside a hackathon) ────────────────
+import HackathonWorkspacePage from "../features/workspace/pages/HackathonWorkspacePage";
+import { WorkspaceOverviewPage } from "../features/workspace/pages/WorkspaceOverviewPage";
+import { OrganizerParticipantsPage } from "../features/workspace/pages/OrganizerParticipantsPage";
+import { OrganizerSubmissionsPage } from "../features/workspace/pages/OrganizerSubmissionsPage";
+import { OrganizerAnnouncementsPage } from "../features/workspace/pages/OrganizerAnnouncementsPage";
+import { JudgeAssignedProjectsPage } from "../features/workspace/pages/JudgeAssignedProjectsPage";
+import { JudgeEvaluationPage } from "../features/workspace/pages/JudgeEvaluationPage";
+import { MentorHelpQueuePage } from "../features/workspace/pages/MentorHelpQueuePage";
+import { ParticipantTeamPage } from "../features/workspace/pages/ParticipantTeamPage";
+import { ParticipantSubmissionPage } from "../features/workspace/pages/ParticipantSubmissionPage";
+import { ParticipantHelpPage } from "../features/workspace/pages/ParticipantHelpPage";
 
 const router = createBrowserRouter([
+
+    // ── Public routes ──────────────────────────────────────────────────────────
     {
         path: "/",
         element: <PublicLayout />,
         errorElement: <NotFound />,
         children: [
-            {
-                index: true,
-                element: <LandingPage />
-            },
-            {
-                path: "about",
-                element: <AboutPage />
-            },
-            {
-                path: "hackathons",
-                element: <HackathonsPage />
-            },
-            {
-                path: "hackathons/:slug",
-                element: <HackathonDetailsPage />
-            }
-        ]
+            { index: true, element: <LandingPage /> },
+            { path: "about", element: <AboutPage /> },
+            { path: "hackathons", element: <HackathonsPage /> },
+            { path: "hackathons/:id", element: <HackathonDetailsPage /> },
+        ],
     },
+
+    // ── Auth routes ────────────────────────────────────────────────────────────
     {
         path: "/",
         element: <AuthLayout />,
         children: [
             {
                 path: "login",
-                element: <LoginPage />
+                element: <PublicOnlyRoute><LoginPage /></PublicOnlyRoute>,
             },
             {
                 path: "register",
-                element: <RegisterPage />
-            }
-        ]
+                element: <PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>,
+            },
+        ],
     },
+
+    // ── Admin routes ───────────────────────────────────────────────────────────
     {
         path: "/admin",
+        element: <AdminRoute><AdminDashboard /></AdminRoute>,
+    },
+
+    // ── Host routes ────────────────────────────────────────────────────────────
+    {
+        path: "/host-dashboard",
         element: (
-            <AdminRoute>
-                <AdminDashboard />
-            </AdminRoute>
-        )
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["HOST"]}>
+                    <HostDashboardPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
     },
     {
         path: "/host-hackathon",
         element: (
             <ProtectedRoute>
-                <HostHackathonPage />
-            </ProtectedRoute>
-        )
-    },
-    {
-        path: "/workspace/:slug",
-        element: (
-            <ProtectedRoute>
-                <HackathonWorkspacePage />
+                <RoleRoute allowedRoles={["HOST"]}>
+                    <HostHackathonPage />
+                </RoleRoute>
             </ProtectedRoute>
         ),
+    },
+    {
+        path: "/host/hackathon/:id/manage",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["HOST"]}>
+                    <HostManagePage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
+
+    // ── Workspace routes (role-specific tabs rendered inside) ──────────────────
+    {
+        path: "/workspace/:id",
+        element: <ProtectedRoute><HackathonWorkspacePage /></ProtectedRoute>,
         children: [
-            {
-                index: true,
-                element: <Navigate to="overview" replace />
-            },
-            {
-                path: "overview",
-                element: <WorkspaceOverviewPage />
-            },
-            {
-                path: "participants",
-                element: <OrganizerParticipantsPage />
-            },
-            {
-                path: "submissions",
-                element: <OrganizerSubmissionsPage />
-            },
-            {
-                path: "announcements",
-                element: <OrganizerAnnouncementsPage />
-            },
-            {
-                path: "team",
-                element: <ParticipantTeamPage />
-            },
-            {
-                path: "submission",
-                element: <ParticipantSubmissionPage />
-            },
-            {
-                path: "help",
-                element: <ParticipantHelpPage />
-            },
-            {
-                path: "assigned-projects",
-                element: <JudgeAssignedProjectsPage />
-            },
-            {
-                path: "evaluation",
-                element: <JudgeEvaluationPage />
-            },
-            {
-                path: "help-queue",
-                element: <MentorHelpQueuePage />
-            }
-        ]
-    }
+            { index: true, element: <Navigate to="overview" replace /> },
+            { path: "overview",           element: <WorkspaceOverviewPage /> },
+            { path: "participants",       element: <OrganizerParticipantsPage /> },
+            { path: "submissions",        element: <OrganizerSubmissionsPage /> },
+            { path: "announcements",      element: <OrganizerAnnouncementsPage /> },
+            { path: "team",               element: <ParticipantTeamPage /> },
+            { path: "submission",         element: <ParticipantSubmissionPage /> },
+            { path: "help",               element: <ParticipantHelpPage /> },
+            { path: "assigned-projects",  element: <JudgeAssignedProjectsPage /> },
+            { path: "evaluation",         element: <JudgeEvaluationPage /> },
+            { path: "help-queue",         element: <MentorHelpQueuePage /> },
+        ],
+    },
 ]);
 
 export default function AppRouter() {
