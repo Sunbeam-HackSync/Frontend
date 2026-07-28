@@ -63,7 +63,7 @@ function UserProfileDropdown({ handleLogout }) {
 }
 
 // ─── Main Navbar ──────────────────────────────────────────────────────────────
-export default function Navbar() {
+export default function Navbar({ hideLinks = false }) {
 
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
@@ -84,6 +84,8 @@ export default function Navbar() {
             path: "/hackathons"
         }
     ];
+
+    const displayLinks = hideLinks ? [] : navLinks;
 
     function goToDashboard() {
         navigate(getRoleRedirectPath(platformRoles));
@@ -145,7 +147,7 @@ export default function Navbar() {
                         "
                     >
 
-                        {navLinks.map((link) => (
+                        {displayLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 to={link.path}
@@ -238,7 +240,7 @@ export default function Navbar() {
 
                         {/* Mobile Links */}
                         {
-                            navLinks.map((link) => (
+                            displayLinks.map((link) => (
                                 <Link
                                     key={link.name}
                                     to={link.path}

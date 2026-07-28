@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { getMyAssignedHackathons, updateInvitationStatus } from "../services/judgeService";
 import { FaGavel, FaCheck, FaTimes } from "react-icons/fa";
+import Navbar from "../../../components/layout/Navbar";
 
 function fmtDate(value) {
   if (!value) return "—";
@@ -94,8 +95,10 @@ export default function JudgeDashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 py-12 text-white">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <>
+      <Navbar hideLinks={true} />
+      <div className="min-h-screen bg-slate-950 py-12 text-white">
+        <div className="mx-auto max-w-7xl px-5 md:px-8">
 
         {/* Header */}
         <div className="mb-10 flex items-start justify-between gap-4">
@@ -130,5 +133,6 @@ export default function JudgeDashboardPage() {
         )}
       </div>
     </div>
+    </>
   );
 }
