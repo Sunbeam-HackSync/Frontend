@@ -2,8 +2,12 @@
 
 import Container from "../common/Container";
 import Button from "../ui/Button";
+import { useNavigate } from "react-router";
 
 export default function HeroSection() {
+
+    const navigate = useNavigate();
+
     return (
         <section className="relative overflow-hidden py-24 lg:py-14">
 
@@ -84,11 +88,11 @@ export default function HeroSection() {
                         {/* Buttons */}
                         <div className="flex flex-wrap gap-4 mt-10">
 
-                            <Button>
+                            <Button onClick={() => { navigate("/hackathons") }}>
                                 Explore Hackathons
                             </Button>
 
-                            <Button variant="secondary">
+                            <Button variant="secondary" onClick={() => { navigate("/host-hackathon") }}>
                                 Host a Hackathon
                             </Button>
 
