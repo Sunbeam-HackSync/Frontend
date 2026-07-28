@@ -29,23 +29,26 @@ import AdminDashboard from "../features/admin/pages/AdminDashboard";
 import HostDashboardPage from "../features/host/pages/HostDashboardPage";
 import HostHackathonPage from "../features/host/pages/HostHackathonPage";
 import HostManagePage from "../features/host/pages/HostManagePage";
-
-// ── Participant feature ───────────────────────────────────────────────────────
+import JudgeDashboardPage from "../features/judge/pages/JudgeDashboardPage";
+import JudgeHackathonDetailsPage from "../features/judge/pages/JudgeHackathonDetailsPage";
 import ParticipantDashboardPage from "../features/participant/pages/ParticipantDashboardPage";
 import ProfilePage from "../features/participant/pages/ProfilePage";
 
+
 // ── Workspace feature (shared by all roles inside a hackathon) ────────────────
 import HackathonWorkspacePage from "../features/workspace/pages/HackathonWorkspacePage";
-import { WorkspaceOverviewPage }      from "../features/workspace/pages/WorkspaceOverviewPage";
-import { OrganizerParticipantsPage }  from "../features/workspace/pages/OrganizerParticipantsPage";
-import { OrganizerSubmissionsPage }   from "../features/workspace/pages/OrganizerSubmissionsPage";
+import { WorkspaceOverviewPage } from "../features/workspace/pages/WorkspaceOverviewPage";
+import { OrganizerParticipantsPage } from "../features/workspace/pages/OrganizerParticipantsPage";
+import { OrganizerSubmissionsPage } from "../features/workspace/pages/OrganizerSubmissionsPage";
 import { OrganizerAnnouncementsPage } from "../features/workspace/pages/OrganizerAnnouncementsPage";
-import { JudgeAssignedProjectsPage }  from "../features/workspace/pages/JudgeAssignedProjectsPage";
-import { JudgeEvaluationPage }        from "../features/workspace/pages/JudgeEvaluationPage";
-import { MentorHelpQueuePage }        from "../features/workspace/pages/MentorHelpQueuePage";
-import { ParticipantTeamPage }        from "../features/workspace/pages/ParticipantTeamPage";
-import { ParticipantSubmissionPage }  from "../features/workspace/pages/ParticipantSubmissionPage";
-import { ParticipantHelpPage }        from "../features/workspace/pages/ParticipantHelpPage";
+import { JudgeAssignedProjectsPage } from "../features/workspace/pages/JudgeAssignedProjectsPage";
+import { JudgeEvaluationPage } from "../features/workspace/pages/JudgeEvaluationPage";
+import { JudgeSubmitWinnersPage } from "../features/workspace/pages/JudgeSubmitWinnersPage";
+
+import { MentorHelpQueuePage } from "../features/workspace/pages/MentorHelpQueuePage";
+import { ParticipantTeamPage } from "../features/workspace/pages/ParticipantTeamPage";
+import { ParticipantSubmissionPage } from "../features/workspace/pages/ParticipantSubmissionPage";
+import { ParticipantHelpPage } from "../features/workspace/pages/ParticipantHelpPage";
 
 const router = createBrowserRouter([
 
@@ -115,6 +118,27 @@ const router = createBrowserRouter([
             </ProtectedRoute>
         ),
     },
+    // ── Judge routes ───────────────────────────────────────────────────────────
+    {
+        path: "/judge-dashboard",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["JUDGE"]}>
+                    <JudgeDashboardPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: "/judge/hackathon/:id",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["JUDGE"]}>
+                    <JudgeHackathonDetailsPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
 
     // ── Participant routes ─────────────────────────────────────────────────────
     {
@@ -143,16 +167,17 @@ const router = createBrowserRouter([
         element: <ProtectedRoute><HackathonWorkspacePage /></ProtectedRoute>,
         children: [
             { index: true, element: <Navigate to="overview" replace /> },
-            { path: "overview",          element: <WorkspaceOverviewPage /> },
-            { path: "participants",      element: <OrganizerParticipantsPage /> },
-            { path: "submissions",       element: <OrganizerSubmissionsPage /> },
-            { path: "announcements",     element: <OrganizerAnnouncementsPage /> },
-            { path: "team",              element: <ParticipantTeamPage /> },
-            { path: "submission",        element: <ParticipantSubmissionPage /> },
-            { path: "help",              element: <ParticipantHelpPage /> },
+            { path: "overview", element: <WorkspaceOverviewPage /> },
+            { path: "participants", element: <OrganizerParticipantsPage /> },
+            { path: "submissions", element: <OrganizerSubmissionsPage /> },
+            { path: "announcements", element: <OrganizerAnnouncementsPage /> },
+            { path: "team", element: <ParticipantTeamPage /> },
+            { path: "submission", element: <ParticipantSubmissionPage /> },
+            { path: "help", element: <ParticipantHelpPage /> },
             { path: "assigned-projects", element: <JudgeAssignedProjectsPage /> },
-            { path: "evaluation",        element: <JudgeEvaluationPage /> },
-            { path: "help-queue",        element: <MentorHelpQueuePage /> },
+            { path: "evaluation", element: <JudgeEvaluationPage /> },
+            { path: "submit-winners", element: <JudgeSubmitWinnersPage /> },
+            { path: "help-queue", element: <MentorHelpQueuePage /> },
         ],
     },
 ]);

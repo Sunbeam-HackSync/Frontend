@@ -15,7 +15,7 @@ export default function useHackathonRole(hackathonId) {
         if (platformRoles.includes("MENTOR")) return "MENTOR";
         
         return "PARTICIPANT";
-    }, [user, platformRoles, hackathonId]);
+    }, [user, platformRoles]);
 
     return role;
 }

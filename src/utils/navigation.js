@@ -8,9 +8,9 @@
  * @returns {string} React Router path
  */
 export function getRoleRedirectPath(platformRoles = []) {
-    if (platformRoles.includes("ADMIN"))       return "/admin";
-    if (platformRoles.includes("HOST"))        return "/host-dashboard";
+    if (platformRoles.includes("ADMIN")) return "/admin";
+    if (platformRoles.includes("HOST")) return "/host-dashboard";
+    if (platformRoles.includes("JUDGE")) return "/judge-dashboard";
     if (platformRoles.includes("PARTICIPANT")) return "/participant-dashboard";
-    // JUDGE, MENTOR → go to hackathon discovery (their workspace-specific UIs are role-gated inside)
     return "/hackathons";
 }

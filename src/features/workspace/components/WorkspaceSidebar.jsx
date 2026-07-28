@@ -9,6 +9,8 @@ import {
 } from "react-icons/fa";
 import { logout } from "../../auth/redux/authSlice";
 import { logoutUser } from "../../auth/services/authService";
+import { getMyAssignedHackathons } from "../../judge/services/judgeService";
+import { useState, useEffect } from "react";
 
 const ROLE_COLORS = {
     ORGANIZER: "text-violet-400 bg-violet-400/10 border-violet-400/20",
@@ -33,7 +35,6 @@ const ROLE_LINKS = {
     ],
     JUDGE: [
         { name: "Assigned Projects", path: "assigned-projects", icon: FaGavel },
-        { name: "Evaluation", path: "evaluation", icon: FaBalanceScale },
     ],
     MENTOR: [
         { name: "Help Queue", path: "help-queue", icon: FaClipboardList },
@@ -48,7 +49,25 @@ const ROLE_LINKS = {
 export default function WorkspaceSidebar({ role, hackathon }) {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const links = ROLE_LINKS[role] || ROLE_LINKS.PARTICIPANT;
+    const [isSuperJudge, setIsSuperJudge] = useState(false);
+
+    useEffect(() => {
+        if (role === "JUDGE" && hackathon?.id) {
+            getMyAssignedHackathons().then((assignments) => {
+                const current = assignments.find(a => a.hackathonId === hackathon.id);
+                if (current && current.isSuperJudge) {
+                    setIsSuperJudge(true);
+                }
+            }).catch(() => { });
+        }
+    }, [role, hackathon?.id]);
+
+    let links = ROLE_LINKS[role] || ROLE_LINKS.PARTICIPANT;
+    if (role === "JUDGE" && isSuperJudge) {
+        // Create a copy and add Submit Winners
+        links = [...links, { name: "Submit Winners", path: "submit-winners", icon: FaBalanceScale }];
+    }
+
     const roleColorClass = ROLE_COLORS[role] || ROLE_COLORS.PARTICIPANT;
 
     async function handleLogout() {
@@ -57,16 +76,24 @@ export default function WorkspaceSidebar({ role, hackathon }) {
         navigate("/login");
     }
 
+    const backNav = {
+        ORGANIZER: { path: "/host-dashboard", label: "Host Dashboard" },
+        JUDGE: { path: "/judge-dashboard", label: "Judge Dashboard" },
+        ADMIN: { path: "/admin", label: "Admin Dashboard" },
+        MENTOR: { path: "/hackathons", label: "All Hackathons" },
+        PARTICIPANT: { path: "/hackathons", label: "All Hackathons" }
+    }[role] || { path: "/hackathons", label: "All Hackathons" };
+
     return (
         <aside className="flex w-64 flex-shrink-0 flex-col border-r border-slate-800 bg-slate-900/60 backdrop-blur-sm">
             {/* Header */}
             <div className="border-b border-slate-800 p-5">
                 <button
-                    onClick={() => navigate("/hackathons")}
+                    onClick={() => navigate(backNav.path)}
                     className="mb-4 flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors"
                 >
                     <FaChevronLeft size={10} />
-                    All Hackathons
+                    {backNav.label}
                 </button>
 
                 <h2 className="text-base font-bold leading-snug text-white line-clamp-2">
@@ -87,10 +114,9 @@ export default function WorkspaceSidebar({ role, hackathon }) {
                             key={link.name}
                             to={link.path}
                             className={({ isActive }) =>
-                                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
-                                    isActive
-                                        ? "bg-sky-500/10 text-sky-300 border border-sky-500/20"
-                                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${isActive
+                                    ? "bg-sky-500/10 text-sky-300 border border-sky-500/20"
+                                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                 }`
                             }
                         >

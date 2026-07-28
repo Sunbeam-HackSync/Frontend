@@ -7,7 +7,7 @@ import { getParticipantHackathonById } from "../services/workspaceService";
 
 export default function HackathonWorkspacePage() {
     const { id } = useParams();
-    
+
     const [hackathon, setHackathon] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -20,7 +20,7 @@ export default function HackathonWorkspacePage() {
                 setLoading(true);
                 const data = await getParticipantHackathonById(id);
                 setHackathon(data);
-            } catch (err) {
+            } catch {
                 setError("Hackathon not found or access denied.");
             } finally {
                 setLoading(false);
