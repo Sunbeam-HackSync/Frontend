@@ -30,6 +30,9 @@ import HostDashboardPage from "../features/host/pages/HostDashboardPage";
 import HostHackathonPage from "../features/host/pages/HostHackathonPage";
 import HostManagePage from "../features/host/pages/HostManagePage";
 import JudgeDashboardPage from "../features/judge/pages/JudgeDashboardPage";
+import MentorDashboardPage from "../features/mentor/pages/MentorDashboardPage";
+import MentorHackathonDetailsPage from "../features/mentor/pages/MentorHackathonDetailsPage";
+import MentorWorkspacePage from "../features/mentor/pages/MentorWorkspacePage";
 import JudgeHackathonDetailsPage from "../features/judge/pages/JudgeHackathonDetailsPage";
 import ParticipantDashboardPage from "../features/participant/pages/ParticipantDashboardPage";
 import ProfilePage from "../features/participant/pages/ProfilePage";
@@ -135,6 +138,37 @@ const router = createBrowserRouter([
             <ProtectedRoute>
                 <RoleRoute allowedRoles={["JUDGE"]}>
                     <JudgeHackathonDetailsPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
+    // ── Mentor routes ───────────────────────────────────────────────────────────
+    {
+        path: "/mentor-dashboard",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["MENTOR"]}>
+                    <MentorDashboardPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: "/mentor/hackathon/:id",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["MENTOR"]}>
+                    <MentorHackathonDetailsPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: "/mentor/workspace/:id",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["MENTOR"]}>
+                    <MentorWorkspacePage />
                 </RoleRoute>
             </ProtectedRoute>
         ),
