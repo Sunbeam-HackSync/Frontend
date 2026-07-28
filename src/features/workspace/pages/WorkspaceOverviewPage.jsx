@@ -2,18 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useOutletContext, Link } from "react-router";
-import { FaCalendarAlt, FaUsers, FaShieldAlt, FaArrowRight } from "react-icons/fa";
+import { FaCalendarAlt, FaUsers, FaShieldAlt, FaArrowRight, FaPlusCircle } from "react-icons/fa";
 
 import { getMyHackathonDetails } from "../../participant/services/participantService";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
-    APPROVED:  "bg-emerald-900/40 text-emerald-300 border-emerald-700/40",
-    ACTIVE:    "bg-blue-900/40 text-blue-300 border-blue-700/40",
+    APPROVED: "bg-emerald-900/40 text-emerald-300 border-emerald-700/40",
+    ACTIVE: "bg-blue-900/40 text-blue-300 border-blue-700/40",
     COMPLETED: "bg-slate-700/40 text-slate-300 border-slate-600/40",
-    DRAFT:     "bg-amber-900/40 text-amber-300 border-amber-700/40",
+    DRAFT: "bg-amber-900/40 text-amber-300 border-amber-700/40",
     PUBLISHED: "bg-indigo-900/40 text-indigo-300 border-indigo-700/40",
-    REJECTED:  "bg-red-900/40 text-red-300 border-red-700/40",
+    REJECTED: "bg-red-900/40 text-red-300 border-red-700/40",
 };
 
 function fmtDate(iso) {
@@ -56,75 +56,75 @@ function ParticipantOverview({ hackathon, details }) {
     const teamDetails = details?.teamDetails;
     const hackathonData = details?.hackathonDetails || hackathon;
 
-    if (!teamDetails) {
-        return (
-            <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-8 text-center">
-                <FaUsers className="mx-auto mb-3 text-slate-600" size={32} />
-                <h3 className="text-lg font-bold text-white">No Team Yet</h3>
-                <p className="mt-2 text-sm text-slate-400">Create or join a team to start participating in this hackathon.</p>
-                <Link
-                    to="team"
-                    className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition"
-                >
-                    Go to Teams
-                    <FaArrowRight size={11} />
-                </Link>
-            </div>
-        );
-    }
-
     return (
         <div className="space-y-6">
             {/* Team card */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-                <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-white">My Team</h2>
-                    <span className="rounded-full bg-indigo-900/40 border border-indigo-700/40 px-3 py-0.5 text-xs font-semibold text-indigo-300">
-                        Team #{teamDetails.teamId}
-                    </span>
+            {!teamDetails ? (
+                <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-8 text-center">
+                    <FaUsers className="mx-auto mb-3 text-slate-600" size={32} />
+                    <h3 className="text-lg font-bold text-white">No Team Yet</h3>
+                    <p className="mt-2 text-sm text-slate-400">Create or join a team to start participating in this hackathon.</p>
+                    <Link
+                        to={`/workspace/${id}/team`}
+                        className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition text-center"
+                    >
+                        Create Teams
+                        <FaPlusCircle className="text-white" size={18} />
+                    </Link>
                 </div>
-                <h3 className="text-2xl font-bold text-indigo-300">{teamDetails.teamName}</h3>
+            ) : (
+                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <div className="mb-4 flex items-center justify-between">
+                        <h2 className="text-lg font-bold text-white">My Team</h2>
+                        <span className="rounded-full bg-indigo-900/40 border border-indigo-700/40 px-3 py-0.5 text-xs font-semibold text-indigo-300">
+                            Team #{teamDetails.teamId}
+                        </span>
+                    </div>
+                    <h3 className="text-2xl font-bold text-indigo-300">{teamDetails.teamName}</h3>
 
-                {/* Members */}
-                <div className="mt-5 space-y-2">
-                    {teamDetails.participants?.map((p) => (
-                        <div
-                            key={p.userId}
-                            className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950 px-4 py-3"
-                        >
-                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-indigo-900/50 text-xs font-bold text-indigo-300">
-                                {(p.fullName || p.email || "?")[0].toUpperCase()}
+                    {/* Members */}
+                    <div className="mt-5 space-y-2">
+                        {teamDetails.participants?.map((p) => (
+                            <div
+                                key={p.userId}
+                                className="flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-950 px-4 py-3"
+                            >
+                                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-indigo-900/50 text-xs font-bold text-indigo-300">
+                                    {(p.fullName || p.email || "?")[0].toUpperCase()}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="truncate text-sm font-medium text-white">{p.fullName || p.email}</p>
+                                    <p className="truncate text-xs text-slate-400">{p.email}</p>
+                                </div>
+                                {p.teamLeader && (
+                                    <span className="flex items-center gap-1 rounded-full bg-amber-900/40 border border-amber-700/40 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
+                                        <FaShieldAlt size={9} /> Leader
+                                    </span>
+                                )}
                             </div>
-                            <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium text-white">{p.fullName || p.email}</p>
-                                <p className="truncate text-xs text-slate-400">{p.email}</p>
-                            </div>
-                            {p.teamLeader && (
-                                <span className="flex items-center gap-1 rounded-full bg-amber-900/40 border border-amber-700/40 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
-                                    <FaShieldAlt size={9} /> Leader
-                                </span>
-                            )}
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* Hackathon timeline */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-                <h2 className="mb-4 text-lg font-bold text-white">Hackathon Timeline</h2>
-                <InfoRow label="Registration Ends" value={fmtDate(hackathonData?.registrationEnd)} />
-                <InfoRow label="Hackathon Starts"  value={fmtDate(hackathonData?.hackathonStart)} />
-                <InfoRow label="Hackathon Ends"    value={fmtDate(hackathonData?.hackathonEnd)} />
-                <InfoRow label="Team Size"         value={`${hackathonData?.minTeamSize}–${hackathonData?.maxTeamSize} members`} />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Hackathon timeline */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <h2 className="mb-4 text-lg font-bold text-white">Hackathon Timeline</h2>
+                    <InfoRow label="Registration Ends" value={fmtDate(hackathonData?.registrationEnd)} />
+                    <InfoRow label="Hackathon Starts" value={fmtDate(hackathonData?.hackathonStart)} />
+                    <InfoRow label="Hackathon Ends" value={fmtDate(hackathonData?.hackathonEnd)} />
+                    <InfoRow label="Team Size" value={`${hackathonData?.minTeamSize}–${hackathonData?.maxTeamSize} members`} />
+                </div>
 
-            {/* Quick links */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-                <h2 className="mb-4 text-lg font-bold text-white">Quick Links</h2>
-                <div className="space-y-2">
-                    <QuickLink to="team"       label="Manage Team" />
-                    <QuickLink to="submission" label="Submit Project" />
-                    <QuickLink to="help"       label="Get Help from Mentor" />
+                {/* Quick links */}
+                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <h2 className="mb-4 text-lg font-bold text-white">Quick Links</h2>
+                    <div className="space-y-2">
+                        <QuickLink to={`/workspace/${id}/team`} label="Manage Team" />
+                        <QuickLink to={`/workspace/${id}/submission`} label="Submit Project" />
+                        <QuickLink to={`/workspace/${id}/help`} label="Get Help from Mentor" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,19 +138,19 @@ function OrganizerOverview({ hackathon }) {
         <div className="space-y-6">
             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
                 <h2 className="mb-4 text-lg font-bold text-white">Hackathon Details</h2>
-                <InfoRow label="Status"              value={hackathon?.hackathonStatus} />
-                <InfoRow label="Team Size"           value={`${hackathon?.minTeamSize}–${hackathon?.maxTeamSize}`} />
+                <InfoRow label="Status" value={hackathon?.hackathonStatus} />
+                <InfoRow label="Team Size" value={`${hackathon?.minTeamSize}–${hackathon?.maxTeamSize}`} />
                 <InfoRow label="Registration Starts" value={fmtDate(hackathon?.registrationStart)} />
-                <InfoRow label="Registration Ends"   value={fmtDate(hackathon?.registrationEnd)} />
-                <InfoRow label="Hackathon Starts"    value={fmtDate(hackathon?.hackathonStart)} />
-                <InfoRow label="Hackathon Ends"      value={fmtDate(hackathon?.hackathonEnd)} />
+                <InfoRow label="Registration Ends" value={fmtDate(hackathon?.registrationEnd)} />
+                <InfoRow label="Hackathon Starts" value={fmtDate(hackathon?.hackathonStart)} />
+                <InfoRow label="Hackathon Ends" value={fmtDate(hackathon?.hackathonEnd)} />
             </div>
 
             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
                 <h2 className="mb-4 text-lg font-bold text-white">Quick Links</h2>
                 <div className="space-y-2">
-                    <QuickLink to="participants"  label="Manage Participants" />
-                    <QuickLink to="submissions"   label="View Submissions" />
+                    <QuickLink to="participants" label="Manage Participants" />
+                    <QuickLink to="submissions" label="View Submissions" />
                     <QuickLink to="announcements" label="Post Announcements" />
                 </div>
             </div>
@@ -177,24 +177,63 @@ export function WorkspaceOverviewPage() {
 
     return (
         <div className="space-y-6">
-            {/* Page header */}
-            <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                    <p className="text-sm text-slate-400 uppercase tracking-wider font-medium">{role} Workspace</p>
-                    <h1 className="mt-1 text-2xl font-bold text-white">{hackathon?.title || "Overview"}</h1>
-                    {hackathon?.tagline && <p className="mt-1 text-indigo-300">{hackathon.tagline}</p>}
-                </div>
-                {hackathon?.hackathonStatus && <StatusBadge status={hackathon.hackathonStatus} />}
-            </div>
+            {/* Hero Header */}
+            <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-xl mb-8">
+                {/* Banner Image */}
+                <div className="relative h-48 md:h-56 bg-slate-800">
+                    {hackathon?.bannerImageUrl && (
+                        <img
+                            src={hackathon.bannerImageUrl}
+                            alt="Banner"
+                            className="absolute inset-0 w-full h-full object-cover opacity-70"
+                        />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent pointer-events-none" />
 
-            {/* Banner */}
-            {hackathon?.bannerImageUrl && (
-                <img
-                    src={hackathon.bannerImageUrl}
-                    alt="Banner"
-                    className="w-full h-44 rounded-2xl object-cover border border-slate-800"
-                />
-            )}
+                    {/* Status Badge in corner */}
+                    {hackathon?.hackathonStatus && (
+                        <div className="absolute top-5 right-5">
+                            <StatusBadge status={hackathon.hackathonStatus} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Profile and Titles */}
+                <div className="relative px-6 pb-8 sm:px-8">
+                    <div className="flex flex-col sm:flex-row sm:items-end gap-6 -mt-16 sm:-mt-20 mb-6">
+                        {hackathon?.profileImageUrl ? (
+                            <img
+                                src={hackathon.profileImageUrl}
+                                alt="Profile"
+                                className="h-24 w-24 sm:h-32 sm:w-32 rounded-2xl object-cover border-4 border-slate-950 shadow-2xl bg-slate-800 shrink-0 relative z-10"
+                            />
+                        ) : (
+                            <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-2xl border-4 border-slate-950 shadow-2xl bg-slate-800 flex items-center justify-center text-4xl shrink-0 relative z-10">🏆</div>
+                        )}
+
+                        <div className="flex-1 pb-1 mt-2 sm:mt-0">
+                            <p className="text-xs text-indigo-400 uppercase tracking-widest font-bold mb-1">{role} Workspace</p>
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight drop-shadow-md">
+                                {hackathon?.title || "Overview"}
+                            </h1>
+                            {hackathon?.tagline && (
+                                <p className="text-sm sm:text-base text-indigo-200 mt-1.5 font-medium drop-shadow-sm">
+                                    {hackathon.tagline}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    {hackathon?.description && (
+                        <div className="mt-2 pt-6 border-t border-slate-800/60">
+                            <p className="text-slate-300 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                                {hackathon.description}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* Role-based content */}
             {isLoading ? (

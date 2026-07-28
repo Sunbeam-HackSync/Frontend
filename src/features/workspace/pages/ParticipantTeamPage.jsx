@@ -18,8 +18,8 @@ import {
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 const createTeamSchema = z.object({
-    teamName:          z.string().min(2, "Team name must be at least 2 characters."),
-    skillsNeeded:      z.string().optional(),
+    teamName: z.string().min(2, "Team name must be at least 2 characters."),
+    skillsNeeded: z.string().optional(),
     lookingForMembers: z.boolean(),
 });
 
@@ -28,7 +28,7 @@ const addMemberSchema = z.object({
 });
 
 const updateTeamSchema = z.object({
-    skillsNeeded:       z.string().optional(),
+    skillsNeeded: z.string().optional(),
     isLookingForMembers: z.boolean(),
 });
 

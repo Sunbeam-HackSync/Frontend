@@ -12,7 +12,7 @@ export default function HackathonWorkspaceLayout({
     return (
         <div
             className="
-                min-h-screen
+                flex-1 w-full
                 bg-slate-950
                 text-white
                 flex
