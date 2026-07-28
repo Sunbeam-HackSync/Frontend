@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
 import { getAdminMetrics, getPendingHackathons, approveHackathon, rejectHackathon, banUser } from "../services/adminService";
+import Navbar from "../../../components/layout/Navbar";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
@@ -154,8 +155,9 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
+    <div className="min-h-screen flex flex-col bg-slate-950 text-white">
+      <Navbar />
+      <div className="flex-1 mx-auto w-full max-w-7xl px-5 py-10 md:px-8">
 
         {/* Header */}
         <div className="mb-10">

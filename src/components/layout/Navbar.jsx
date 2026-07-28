@@ -14,6 +14,7 @@ import { getRoleRedirectPath } from "../../utils/navigation";
 
 // ─── User Profile Dropdown ────────────────────────────────────────────────────
 function UserProfileDropdown({ handleLogout }) {
+    const { platformRoles } = useSelector((state) => state.auth);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef(null);
 
@@ -28,13 +29,24 @@ function UserProfileDropdown({ handleLogout }) {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // Get the user's display role
+    const displayRole = platformRoles?.[1] || platformRoles?.[0] || "";
+    const cleanRole = displayRole.replace("ROLE_", "");
+
     return (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative group" ref={dropdownRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-slate-300 transition hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 cursor-pointer"
+                className="relative flex h-10 w-10 items-center justify-center rounded-full border border-slate-700 bg-slate-800 text-slate-300 transition hover:bg-slate-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 cursor-pointer"
             >
                 <FaUserCircle size={20} />
+
+                {/* Hover Nameplate */}
+                {cleanRole && (
+                    <span className="pointer-events-none absolute -bottom-5 -right-9 z-50 flex items-center justify-center whitespace-nowrap rounded border border-indigo-700/50 bg-indigo-600 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white opacity-0 shadow-lg transition-opacity duration-300 group-hover:opacity-100">
+                        {cleanRole}
+                    </span>
+                )}
             </button>
 
             {isOpen && (

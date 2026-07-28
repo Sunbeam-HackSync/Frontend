@@ -15,13 +15,13 @@ import { useSelector } from "react-redux";
 
 // ─── Zod schema ───────────────────────────────────────────────────────────────
 const profileSchema = z.object({
-    fullName:    z.string().min(1, "Full name is required."),
-    bio:         z.string().optional(),
-    techSkills:  z.string().optional(),
-    githubURL:   z.string().optional(),
+    fullName: z.string().min(1, "Full name is required."),
+    bio: z.string().optional(),
+    techSkills: z.string().optional(),
+    githubURL: z.string().optional(),
     linkedInURL: z.string().optional(),
-    xurl:        z.string().optional(),
-    avatarURL:   z.string().optional(),
+    xurl: z.string().optional(),
+    avatarURL: z.string().optional(),
 });
 
 // ─── Input component ──────────────────────────────────────────────────────────
@@ -100,7 +100,7 @@ function ProfileSkeleton() {
                 <div className="h-8 w-48 rounded bg-slate-800 mb-2"></div>
                 <div className="h-4 w-64 rounded bg-slate-800"></div>
             </div>
-            
+
             <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl">
                 <div className="h-32 bg-slate-800"></div>
                 <div className="px-8 pb-8">
@@ -114,7 +114,7 @@ function ProfileSkeleton() {
                     </div>
                 </div>
             </div>
-            
+
             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8 space-y-4">
                 <div className="h-6 w-32 rounded bg-slate-800"></div>
                 <div className="flex gap-2">
@@ -211,11 +211,11 @@ export default function ProfilePage() {
                                 : "Your public profile is shown to organizers, judges, and teammates."}
                         </p>
                     </div>
-                    
+
                     {existingProfile && !isEditing && (
                         <button
                             onClick={() => setIsEditing(true)}
-                            className="flex items-center gap-2 rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700 border border-slate-700"
+                            className="flex items-center gap-2 rounded-xl bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:bg-slate-700 border border-slate-700 cursor-pointer"
                         >
                             <MdEditSquare size={16} className="text-indigo-400" /> Edit Profile
                         </button>
@@ -227,13 +227,13 @@ export default function ProfilePage() {
                     <div className="space-y-6">
                         <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900 shadow-xl shadow-black/20">
                             <div className="h-32 bg-gradient-to-r from-indigo-900/60 to-purple-900/60"></div>
-                            
+
                             <div className="px-8 pb-8">
                                 <div className="relative -mt-16 mb-4 flex justify-between items-end">
                                     {existingProfile.avatarURL ? (
-                                        <img 
-                                            src={existingProfile.avatarURL} 
-                                            alt={existingProfile.fullName} 
+                                        <img
+                                            src={existingProfile.avatarURL}
+                                            alt={existingProfile.fullName}
                                             className="h-32 w-32 rounded-2xl border-4 border-slate-900 object-cover bg-slate-800"
                                         />
                                     ) : (
@@ -242,19 +242,19 @@ export default function ProfilePage() {
                                         </div>
                                     )}
                                 </div>
-                                
+
                                 <div>
                                     <h2 className="text-3xl font-bold text-white">{existingProfile.fullName}</h2>
                                     <div className="mt-2 flex flex-wrap items-center gap-3">
                                         <span className="flex items-center gap-1.5 text-sm font-medium text-slate-400">
-                                            <FaEnvelope size={13} className="text-slate-500" /> 
+                                            <FaEnvelope size={13} className="text-slate-500" />
                                             {user?.email}
                                         </span>
-                                        {platformRoles?.map(role => (
-                                            <span key={role} className="rounded-md bg-indigo-900/40 border border-indigo-700/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
-                                                {role}
+                                        {
+                                            <span className="rounded-md bg-indigo-900/40 border border-indigo-700/40 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-300">
+                                                {platformRoles[1]}
                                             </span>
-                                        ))}
+                                        }
                                     </div>
                                     {existingProfile.bio && (
                                         <p className="mt-4 text-slate-300 leading-relaxed max-w-xl">
@@ -391,7 +391,7 @@ export default function ProfilePage() {
                             >
                                 {isSubmitting ? "Saving..." : existingProfile ? "Save Changes" : "Create Profile"}
                             </button>
-                            
+
                             {existingProfile && (
                                 <button
                                     type="button"
