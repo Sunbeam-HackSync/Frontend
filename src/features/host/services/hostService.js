@@ -157,9 +157,9 @@ export async function disqualifySubmission(hackathonId, submissionId) {
 // ─── Judge Management ──────────────────────────────────────────────────────────
 
 /** Assign a judge as Super Judge. */
-export async function assignSuperJudge(hackathonId, judgeUserId) {
+export async function assignSuperJudge(hackathonId, judgeEmail) {
   try {
-    const response = await api.put(`/host/hackathon/${hackathonId}/judges/${judgeUserId}/assign-super-judge`);
+    const response = await api.put(`/host/hackathon/${hackathonId}/judges/${judgeEmail}/assign-super-judge`);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Failed to assign super judge.");

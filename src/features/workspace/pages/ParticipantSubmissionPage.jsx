@@ -76,6 +76,7 @@ export function ParticipantSubmissionPage() {
     const [teamId, setTeamId] = useState(null);
     const [isLoadingTeam, setIsLoadingTeam] = useState(true);
     const [submission, setSubmission] = useState(null);
+    const [hackathonStatus, setHackathonStatus] = useState(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(submissionSchema),
@@ -86,6 +87,12 @@ export function ParticipantSubmissionPage() {
             .then((data) => {
                 if (data?.teamDetails?.teamId) {
                     setTeamId(data.teamDetails.teamId);
+                }
+                if (data?.hackathonDetails?.hackathonStatus) {
+                    setHackathonStatus(data.hackathonDetails.hackathonStatus);
+                }
+                if (data?.projectSubmission) {
+                    setSubmission(data.projectSubmission);
                 }
             })
             .catch((err) => toast.error(err.message))
@@ -106,6 +113,8 @@ export function ParticipantSubmissionPage() {
         }
     }
 
+    const isCompleted = hackathonStatus === "COMPLETED";
+
     return (
         <div>
             <div className="mb-6">
@@ -125,6 +134,11 @@ export function ParticipantSubmissionPage() {
                 </div>
             ) : submission ? (
                 <SuccessPanel submission={submission} />
+            ) : isCompleted ? (
+                <div className="rounded-2xl border border-amber-800/40 bg-amber-900/10 p-6 text-center">
+                    <p className="text-amber-300 font-semibold">This hackathon has ended.</p>
+                    <p className="mt-1 text-sm text-slate-400">Project submissions are closed.</p>
+                </div>
             ) : (
                 <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">

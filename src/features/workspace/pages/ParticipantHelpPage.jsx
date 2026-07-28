@@ -6,7 +6,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "react-toastify";
-import { FaTicketAlt, FaPlus } from "react-icons/fa";
+import { FaTicketAlt, FaPlus, FaVideo } from "react-icons/fa";
+
+import webSocketService from "../../../services/websocketService";
 
 import {
     getMyHackathonDetails,
@@ -16,19 +18,19 @@ import {
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 const helpSchema = z.object({
-    issueTitle:       z.string().min(5, "Title must be at least 5 characters."),
+    issueTitle: z.string().min(5, "Title must be at least 5 characters."),
     issueDescription: z.string().min(20, "Please describe the issue in more detail."),
-    techTags:         z.string().min(1, "Add at least one tech tag."),
+    techTags: z.string().min(1, "Add at least one tech tag."),
 });
 
 const inputClass = "w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 const TICKET_STATUS = {
-    OPEN:     "bg-blue-900/40 border-blue-700/40 text-blue-300",
-    CLAIMED:  "bg-amber-900/40 border-amber-700/40 text-amber-300",
+    OPEN: "bg-blue-900/40 border-blue-700/40 text-blue-300",
+    CLAIMED: "bg-amber-900/40 border-amber-700/40 text-amber-300",
     RESOLVED: "bg-emerald-900/40 border-emerald-700/40 text-emerald-300",
-    CLOSED:   "bg-slate-700/40 border-slate-600/40 text-slate-400",
+    CLOSED: "bg-slate-700/40 border-slate-600/40 text-slate-400",
 };
 
 function TicketStatusBadge({ status }) {
@@ -60,6 +62,19 @@ function TicketCard({ ticket }) {
                 </div>
             )}
 
+            {ticket.status === 'CLAIMED' && ticket.participantMeetingLink && (
+                <div className="mt-4 pt-4 border-t border-slate-800">
+                    <a
+                        href={ticket.participantMeetingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-xl bg-sky-600/20 text-sky-400 border border-sky-500/30 px-4 py-2 text-sm font-semibold hover:bg-sky-600/40 transition"
+                    >
+                        <FaVideo /> Join Meeting with Mentor
+                    </a>
+                </div>
+            )}
+
             {ticket.ticketId && (
                 <p className="mt-2 text-xs text-slate-600">Ticket #{ticket.ticketId}</p>
             )}
@@ -70,12 +85,13 @@ function TicketCard({ ticket }) {
 // ─── Main export ──────────────────────────────────────────────────────────────
 export function ParticipantHelpPage() {
     const { id } = useParams();
-    const [teamId, setTeamId]         = useState(null);
+    const [teamId, setTeamId] = useState(null);
     const [hackathonId, setHackathonId] = useState(null);
-    const [tickets, setTickets]       = useState([]);
+    const [tickets, setTickets] = useState([]);
     const [isLoadingTeam, setIsLoadingTeam] = useState(true);
     const [isLoadingTickets, setIsLoadingTickets] = useState(false);
-    const [showForm, setShowForm]     = useState(false);
+    const [showForm, setShowForm] = useState(false);
+    const [hackathonStatus, setHackathonStatus] = useState(null);
 
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(helpSchema),
@@ -89,6 +105,7 @@ export function ParticipantHelpPage() {
                 const hid = data?.hackathonDetails?.id || parseInt(id);
                 setTeamId(tid);
                 setHackathonId(hid);
+                setHackathonStatus(data?.hackathonDetails?.hackathonStatus);
             })
             .catch((err) => toast.error(err.message))
             .finally(() => setIsLoadingTeam(false));
@@ -97,10 +114,31 @@ export function ParticipantHelpPage() {
     // Load tickets once we have team context
     useEffect(() => {
         if (!teamId || !hackathonId) return;
-        setIsLoadingTickets(true);
-        getMyTickets(hackathonId, teamId)
-            .then(setTickets)
-            .finally(() => setIsLoadingTickets(false));
+
+        const loadTickets = () => {
+            setIsLoadingTickets(true);
+            getMyTickets(hackathonId, teamId)
+                .then(setTickets)
+                .finally(() => setIsLoadingTickets(false));
+        };
+
+        loadTickets();
+
+        // Connect to WebSocket for real-time ticket updates
+        webSocketService.connect(() => {
+            webSocketService.subscribe('/topic/tickets', () => {
+                // Refresh tickets when any ticket is created, claimed, or resolved
+                // Add a small delay to ensure backend DB transaction has committed
+                setTimeout(() => {
+                    getMyTickets(hackathonId, teamId).then(setTickets);
+                }, 500);
+            });
+        });
+
+        return () => {
+            webSocketService.unsubscribe('/topic/tickets');
+            webSocketService.disconnect();
+        };
     }, [teamId, hackathonId]);
 
     async function onSubmit(data) {
@@ -115,6 +153,8 @@ export function ParticipantHelpPage() {
         }
     }
 
+    const isCompleted = hackathonStatus === "COMPLETED";
+
     return (
         <div>
             <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -124,7 +164,7 @@ export function ParticipantHelpPage() {
                     <p className="mt-1 text-sm text-slate-400">Create a help ticket — a mentor will claim it and schedule a session.</p>
                 </div>
 
-                {!isLoadingTeam && teamId && (
+                {!isLoadingTeam && teamId && !isCompleted && (
                     <button
                         onClick={() => setShowForm(!showForm)}
                         className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500"
@@ -134,6 +174,12 @@ export function ParticipantHelpPage() {
                     </button>
                 )}
             </div>
+
+            {isCompleted && (
+                <div className="mb-6 rounded-xl border border-amber-800/40 bg-amber-900/10 p-4 text-amber-300 font-medium">
+                    This hackathon has ended. Mentor help queue is closed.
+                </div>
+            )}
 
             {isLoadingTeam ? (
                 <div className="animate-pulse space-y-4">
