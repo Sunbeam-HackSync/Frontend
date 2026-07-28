@@ -10,6 +10,7 @@
 export function getRoleRedirectPath(platformRoles = []) {
     if (platformRoles.includes("ADMIN"))       return "/admin";
     if (platformRoles.includes("HOST"))        return "/host-dashboard";
-    // PARTICIPANT, JUDGE, MENTOR → hackathon discovery feed
+    if (platformRoles.includes("JUDGE"))       return "/judge-dashboard";
+    // PARTICIPANT, MENTOR → hackathon discovery feed
     return "/hackathons";
 }

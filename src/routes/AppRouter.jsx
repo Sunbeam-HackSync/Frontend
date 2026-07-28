@@ -30,6 +30,11 @@ import HostDashboardPage from "../features/host/pages/HostDashboardPage";
 import HostHackathonPage from "../features/host/pages/HostHackathonPage";
 import HostManagePage from "../features/host/pages/HostManagePage";
 
+// ── Judge feature ─────────────────────────────────────────────────────────────
+import JudgeDashboardPage from "../features/judge/pages/JudgeDashboardPage";
+import JudgeHackathonDetailsPage from "../features/judge/pages/JudgeHackathonDetailsPage";
+
+
 // ── Workspace feature (shared by all roles inside a hackathon) ────────────────
 import HackathonWorkspacePage from "../features/workspace/pages/HackathonWorkspacePage";
 import { WorkspaceOverviewPage } from "../features/workspace/pages/WorkspaceOverviewPage";
@@ -38,6 +43,7 @@ import { OrganizerSubmissionsPage } from "../features/workspace/pages/OrganizerS
 import { OrganizerAnnouncementsPage } from "../features/workspace/pages/OrganizerAnnouncementsPage";
 import { JudgeAssignedProjectsPage } from "../features/workspace/pages/JudgeAssignedProjectsPage";
 import { JudgeEvaluationPage } from "../features/workspace/pages/JudgeEvaluationPage";
+import { JudgeSubmitWinnersPage } from "../features/workspace/pages/JudgeSubmitWinnersPage";
 import { MentorHelpQueuePage } from "../features/workspace/pages/MentorHelpQueuePage";
 import { ParticipantTeamPage } from "../features/workspace/pages/ParticipantTeamPage";
 import { ParticipantSubmissionPage } from "../features/workspace/pages/ParticipantSubmissionPage";
@@ -112,6 +118,28 @@ const router = createBrowserRouter([
         ),
     },
 
+    // ── Judge routes ───────────────────────────────────────────────────────────
+    {
+        path: "/judge-dashboard",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["JUDGE"]}>
+                    <JudgeDashboardPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
+    {
+        path: "/judge/hackathon/:id",
+        element: (
+            <ProtectedRoute>
+                <RoleRoute allowedRoles={["JUDGE"]}>
+                    <JudgeHackathonDetailsPage />
+                </RoleRoute>
+            </ProtectedRoute>
+        ),
+    },
+
     // ── Workspace routes (role-specific tabs rendered inside) ──────────────────
     {
         path: "/workspace/:id",
@@ -127,6 +155,7 @@ const router = createBrowserRouter([
             { path: "help",               element: <ParticipantHelpPage /> },
             { path: "assigned-projects",  element: <JudgeAssignedProjectsPage /> },
             { path: "evaluation",         element: <JudgeEvaluationPage /> },
+            { path: "submit-winners",     element: <JudgeSubmitWinnersPage /> },
             { path: "help-queue",         element: <MentorHelpQueuePage /> },
         ],
     },
