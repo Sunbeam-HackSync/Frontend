@@ -85,7 +85,8 @@ export default function Navbar({ hideLinks = false }) {
         }
     ];
 
-    const displayLinks = hideLinks ? [] : navLinks;
+    const shouldHideLinks = hideLinks || platformRoles?.includes("MENTOR");
+    const displayLinks = shouldHideLinks ? [] : navLinks;
 
     function goToDashboard() {
         navigate(getRoleRedirectPath(platformRoles));
