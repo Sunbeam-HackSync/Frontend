@@ -20,6 +20,11 @@ const initialState = {
     registrationEnd: "",
     hackathonStart: "",
     hackathonEnd: "",
+    resultDeclarationDate: "",
+
+    // New fields
+    faq: "",
+    rules: "",
   },
   errors: {},
   isSubmitting: false,

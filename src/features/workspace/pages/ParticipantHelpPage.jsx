@@ -1,159 +1,237 @@
-import { useState, useEffect } from "react";
+// src/features/workspace/pages/ParticipantHelpPage.jsx
+
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useOutletContext } from "react-router";
-import { useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "react-toastify";
+import { FaTicketAlt, FaPlus } from "react-icons/fa";
 
-import { createHelpTicket } from "../services/workspaceService";
-import PageHeader from "../components/PageHeader";
-import Panel from "../components/Panel";
-import Button from "../../../components/ui/Button";
-import Badge from "../components/Badge";
+import {
+    getMyHackathonDetails,
+    createHelpTicket,
+    getMyTickets,
+} from "../../participant/services/participantService";
 
-export function ParticipantHelpPage() {
-  const { id: hackathonId } = useParams();
-  const { hackathon } = useOutletContext();
-  const { user } = useSelector((state) => state.auth);
+// ─── Schema ───────────────────────────────────────────────────────────────────
+const helpSchema = z.object({
+    issueTitle:       z.string().min(5, "Title must be at least 5 characters."),
+    issueDescription: z.string().min(20, "Please describe the issue in more detail."),
+    techTags:         z.string().min(1, "Add at least one tech tag."),
+});
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [techTags, setTechTags] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [myTickets, setMyTickets] = useState([]);
-  const [submitError, setSubmitError] = useState(null);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
+const inputClass = "w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20";
 
-  // NOTE: We don't have a GET endpoint for tickets in the spec yet.
-  // Submitted tickets are shown optimistically from local state.
+// ─── Status badge ─────────────────────────────────────────────────────────────
+const TICKET_STATUS = {
+    OPEN:     "bg-blue-900/40 border-blue-700/40 text-blue-300",
+    CLAIMED:  "bg-amber-900/40 border-amber-700/40 text-amber-300",
+    RESOLVED: "bg-emerald-900/40 border-emerald-700/40 text-emerald-300",
+    CLOSED:   "bg-slate-700/40 border-slate-600/40 text-slate-400",
+};
 
-  async function submitTicket(event) {
-    event.preventDefault();
-    if (!title.trim() || !description.trim() || !techTags.trim()) return;
+function TicketStatusBadge({ status }) {
+    return (
+        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TICKET_STATUS[status] || TICKET_STATUS.OPEN}`}>
+            {status}
+        </span>
+    );
+}
 
-    try {
-      setSubmitting(true);
-      setSubmitError(null);
-
-      // The API requires a teamId. For now we pass null and let the backend handle it.
-      // When a GET /participants/hackathons/{id}/myTeam endpoint is available, we fetch the teamId first.
-      const newTicket = await createHelpTicket({
-        teamId: null,         // Will be linked to team on backend via JWT user context
-        issueTitle: title.trim(),
-        issueDescription: description.trim(),
-        techTags: techTags.trim(),
-      });
-
-      setMyTickets((prev) => [newTicket, ...prev]);
-      setTitle("");
-      setDescription("");
-      setTechTags("");
-      setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 3000);
-    } catch (error) {
-      setSubmitError(error.response?.data?.message || "Failed to submit ticket. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  const STATUS_STYLES = {
-    OPEN: "border-sky-500/30 bg-sky-500/5",
-    CLAIMED: "border-amber-500/30 bg-amber-500/5",
-    RESOLVED: "border-emerald-500/30 bg-emerald-500/5",
-    CLOSED_UNRESOLVED: "border-slate-700 bg-slate-900",
-  };
-
-  return (
-    <>
-      <PageHeader
-        eyebrow="Participant"
-        title="Help Tickets"
-        description="Raise a blocker with a mentor. Describe your issue clearly so they can help you fast."
-      />
-
-      <div className="grid gap-6 xl:grid-cols-[0.85fr_1.15fr]">
-        {/* Submit Form */}
-        <Panel title="Request Mentor Help">
-          <form onSubmit={submitTicket} className="space-y-4">
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-300">Issue Title *</label>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="e.g. Getting 500 error on login endpoint"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-300">Tech Tags *</label>
-              <input
-                value={techTags}
-                onChange={(e) => setTechTags(e.target.value)}
-                placeholder="e.g. React, Spring Boot, JWT, MySQL"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-300">Describe the Blocker *</label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="What did you try? What is the exact error? What do you expect to happen?"
-                rows={5}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20"
-                required
-              />
-            </div>
-
-            {submitError && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                {submitError}
-              </div>
-            )}
-
-            {submitSuccess && (
-              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
-                ✓ Ticket submitted! A mentor will claim it shortly.
-              </div>
-            )}
-
-            <Button disabled={submitting} className="w-full">
-              {submitting ? "Submitting..." : "🚩 Raise Ticket"}
-            </Button>
-          </form>
-        </Panel>
-
-        {/* Ticket Status Board */}
-        <Panel title="My Ticket Status">
-          <div className="space-y-3">
-            {myTickets.length === 0 ? (
-              <div className="rounded-lg border border-slate-800 bg-slate-950 p-6 text-center">
-                <p className="text-slate-400 text-sm">No tickets raised yet.</p>
-                <p className="text-slate-500 text-xs mt-1">Use the form to request mentor help.</p>
-              </div>
-            ) : (
-              myTickets.map((ticket, index) => (
-                <div
-                  key={ticket.id || index}
-                  className={`rounded-lg border p-4 ${STATUS_STYLES[ticket.status] || STATUS_STYLES.OPEN}`}
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-white">{ticket.issueTitle}</h3>
-                      <p className="mt-1 text-xs text-slate-500">{ticket.techTags}</p>
-                    </div>
-                    <Badge>{ticket.status || "OPEN"}</Badge>
-                  </div>
-                  <p className="mt-2 text-sm text-slate-400 line-clamp-2">{ticket.issueDescription}</p>
+// ─── Ticket card ──────────────────────────────────────────────────────────────
+function TicketCard({ ticket }) {
+    const tags = ticket.techTags ? ticket.techTags.split(",").map(t => t.trim()).filter(Boolean) : [];
+    return (
+        <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
+            <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-white truncate">{ticket.issueTitle}</p>
+                    <p className="mt-1 text-sm text-slate-400 line-clamp-2">{ticket.issueDescription}</p>
                 </div>
-              ))
+                <TicketStatusBadge status={ticket.status} />
+            </div>
+
+            {tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                    {tags.map((tag) => (
+                        <span key={tag} className="rounded-md bg-slate-800 px-2 py-0.5 text-xs text-slate-300">{tag}</span>
+                    ))}
+                </div>
             )}
-          </div>
-        </Panel>
-      </div>
-    </>
-  );
+
+            {ticket.ticketId && (
+                <p className="mt-2 text-xs text-slate-600">Ticket #{ticket.ticketId}</p>
+            )}
+        </div>
+    );
+}
+
+// ─── Main export ──────────────────────────────────────────────────────────────
+export function ParticipantHelpPage() {
+    const { id } = useParams();
+    const [teamId, setTeamId]         = useState(null);
+    const [hackathonId, setHackathonId] = useState(null);
+    const [tickets, setTickets]       = useState([]);
+    const [isLoadingTeam, setIsLoadingTeam] = useState(true);
+    const [isLoadingTickets, setIsLoadingTickets] = useState(false);
+    const [showForm, setShowForm]     = useState(false);
+
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+        resolver: zodResolver(helpSchema),
+    });
+
+    // Load team context
+    useEffect(() => {
+        getMyHackathonDetails(id)
+            .then((data) => {
+                const tid = data?.teamDetails?.teamId;
+                const hid = data?.hackathonDetails?.id || parseInt(id);
+                setTeamId(tid);
+                setHackathonId(hid);
+            })
+            .catch((err) => toast.error(err.message))
+            .finally(() => setIsLoadingTeam(false));
+    }, [id]);
+
+    // Load tickets once we have team context
+    useEffect(() => {
+        if (!teamId || !hackathonId) return;
+        setIsLoadingTickets(true);
+        getMyTickets(hackathonId, teamId)
+            .then(setTickets)
+            .finally(() => setIsLoadingTickets(false));
+    }, [teamId, hackathonId]);
+
+    async function onSubmit(data) {
+        try {
+            const ticket = await createHelpTicket({ teamId, ...data });
+            setTickets((prev) => [ticket, ...prev]);
+            toast.success("Help ticket created! A mentor will pick it up soon.");
+            reset();
+            setShowForm(false);
+        } catch (err) {
+            toast.error(err.message);
+        }
+    }
+
+    return (
+        <div>
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">Participant</p>
+                    <h1 className="mt-1 text-2xl font-bold text-white">Mentor Help</h1>
+                    <p className="mt-1 text-sm text-slate-400">Create a help ticket — a mentor will claim it and schedule a session.</p>
+                </div>
+
+                {!isLoadingTeam && teamId && (
+                    <button
+                        onClick={() => setShowForm(!showForm)}
+                        className="flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500"
+                    >
+                        <FaPlus size={12} />
+                        {showForm ? "Cancel" : "New Ticket"}
+                    </button>
+                )}
+            </div>
+
+            {isLoadingTeam ? (
+                <div className="animate-pulse space-y-4">
+                    {[1, 2].map((k) => <div key={k} className="h-20 rounded-xl bg-slate-900 border border-slate-800" />)}
+                </div>
+            ) : !teamId ? (
+                <div className="rounded-2xl border border-amber-800/40 bg-amber-900/10 p-6 text-center">
+                    <p className="text-amber-300 font-semibold">You need a team to request mentor help.</p>
+                    <p className="mt-1 text-sm text-slate-400">Please create or join a team first from the Team tab.</p>
+                </div>
+            ) : (
+                <>
+                    {/* Create ticket form */}
+                    {showForm && (
+                        <div className="mb-6 rounded-2xl border border-indigo-800/40 bg-slate-900 p-6">
+                            <h2 className="mb-4 text-base font-bold text-white">New Help Ticket</h2>
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-300">Issue Title *</label>
+                                    <input
+                                        className={inputClass}
+                                        placeholder="Brief summary of the problem"
+                                        {...register("issueTitle")}
+                                    />
+                                    {errors.issueTitle && <p className="mt-1 text-xs text-red-400">{errors.issueTitle.message}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-300">Description *</label>
+                                    <textarea
+                                        rows={4}
+                                        className={inputClass}
+                                        placeholder="Explain what you're stuck on, what you've tried, and any error messages..."
+                                        {...register("issueDescription")}
+                                    />
+                                    {errors.issueDescription && <p className="mt-1 text-xs text-red-400">{errors.issueDescription.message}</p>}
+                                </div>
+
+                                <div>
+                                    <label className="mb-1.5 block text-sm font-medium text-slate-300">Tech Tags *</label>
+                                    <input
+                                        className={inputClass}
+                                        placeholder="e.g. React, Spring Boot, Docker"
+                                        {...register("techTags")}
+                                    />
+                                    <p className="mt-1 text-xs text-slate-500">Comma-separated tags. Helps route to the right mentor.</p>
+                                    {errors.techTags && <p className="mt-1 text-xs text-red-400">{errors.techTags.message}</p>}
+                                </div>
+
+                                <div className="flex gap-3 pt-1">
+                                    <button
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                        className="flex-1 rounded-xl bg-indigo-600 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+                                    >
+                                        {isSubmitting ? "Creating..." : "Create Ticket"}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setShowForm(false); reset(); }}
+                                        className="rounded-xl border border-slate-600 bg-slate-800 px-6 py-3 text-sm font-medium text-slate-300 transition hover:bg-slate-700"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
+
+                    {/* Ticket list */}
+                    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                        <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-white">
+                            <FaTicketAlt size={14} className="text-indigo-400" />
+                            My Tickets
+                            {tickets.length > 0 && (
+                                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-xs text-slate-400">{tickets.length}</span>
+                            )}
+                        </h2>
+
+                        {isLoadingTickets ? (
+                            <div className="space-y-3">
+                                {[1, 2].map(k => <div key={k} className="animate-pulse h-20 rounded-xl bg-slate-950" />)}
+                            </div>
+                        ) : tickets.length === 0 ? (
+                            <div className="py-10 text-center">
+                                <FaTicketAlt className="mx-auto mb-3 text-slate-700" size={28} />
+                                <p className="text-sm text-slate-400">No tickets yet. Create one if you need help!</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {tickets.map((t) => (
+                                    <TicketCard key={t.ticketId || Math.random()} ticket={t} />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
+        </div>
+    );
 }

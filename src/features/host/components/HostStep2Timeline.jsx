@@ -49,6 +49,11 @@ export default function HostStep2Timeline() {
             label: "Hackathon Ends",
             hint: "Submission deadline",
         },
+        {
+            key: "resultDeclarationDate",
+            label: "Result Declaration Date",
+            hint: "When the winners will be announced",
+        },
     ];
 
     return (

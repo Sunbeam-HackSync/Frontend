@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import Navbar from "../../../components/layout/Navbar";
 import { getHostHackathons } from "../services/hostService";
 
 // ─── Status config ─────────────────────────────────────────────────────────────
@@ -128,8 +129,9 @@ export default function HostDashboardPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 py-12 text-white">
-      <div className="mx-auto max-w-7xl px-5 md:px-8">
+    <div className="min-h-screen bg-slate-950 text-white">
+      <Navbar />
+      <div className="py-12 mx-auto max-w-7xl px-5 md:px-8">
 
         {/* Header */}
         <div className="mb-10 flex items-start justify-between gap-4">

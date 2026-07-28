@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 import Button from "../../../components/ui/Button";
+import Navbar from "../../../components/layout/Navbar";
 import HostStep1BasicInfo from "../components/HostStep1BasicInfo";
 import HostStep2Timeline from "../components/HostStep2Timeline";
 import HostStep3Review from "../components/HostStep3Review";
@@ -25,6 +26,8 @@ function validateStep(step, formData) {
         if (!formData.title.trim()) errors.title = "Title is required.";
         if (!formData.tagline.trim()) errors.tagline = "Tagline is required.";
         if (!formData.description.trim()) errors.description = "Description is required.";
+        if (!formData.faq?.trim()) errors.faq = "FAQ is required.";
+        if (!formData.rules?.trim()) errors.rules = "Rules are required.";
     }
 
     if (step === 2) {
@@ -32,6 +35,7 @@ function validateStep(step, formData) {
         if (!formData.registrationEnd) errors.registrationEnd = "Registration end is required.";
         if (!formData.hackathonStart) errors.hackathonStart = "Hackathon start is required.";
         if (!formData.hackathonEnd) errors.hackathonEnd = "Hackathon end is required.";
+        if (!formData.resultDeclarationDate) errors.resultDeclarationDate = "Result declaration date is required.";
 
         if (formData.registrationStart && formData.registrationEnd &&
             formData.registrationStart >= formData.registrationEnd) {
@@ -78,7 +82,6 @@ export default function HostHackathonPage() {
         try {
             dispatch(setSubmitting(true));
 
-            // Payload exactly matches HackathonRequestDTO
             const payload = {
                 title: formData.title.trim(),
                 tagline: formData.tagline.trim(),
@@ -91,6 +94,9 @@ export default function HostHackathonPage() {
                 registrationEnd: formData.registrationEnd,
                 hackathonStart: formData.hackathonStart,
                 hackathonEnd: formData.hackathonEnd,
+                resultDeclarationDate: formData.resultDeclarationDate,
+                faq: formData.faq.trim(),
+                rules: formData.rules.trim()
             };
 
             const hackathon = await createHackathon(payload);
@@ -106,8 +112,9 @@ export default function HostHackathonPage() {
     }
 
     return (
-        <div className="min-h-screen bg-slate-950 py-12 text-white">
-            <div className="mx-auto max-w-3xl px-5">
+        <div className="min-h-screen bg-slate-950 text-white">
+            <Navbar />
+            <div className="py-12 mx-auto max-w-3xl px-5">
 
                 {/* Header */}
                 <div className="mb-10">

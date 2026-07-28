@@ -8,7 +8,7 @@ import Panel from "../../features/workspace/components/Panel";
 import StatCard from "../../features/workspace/components/StatCard";
 import Button from "../../components/ui/Button";
 import Container from "../../components/common/Container";
-import { formatDateTime, isPast } from "../../utils/formatters";
+import { formatDateTime } from "../../utils/formatters";
 import { getParticipantHackathonById } from "../../features/workspace/services/workspaceService";
 
 export default function HackathonDetailsPage() {
@@ -56,30 +56,22 @@ export default function HackathonDetailsPage() {
     );
   }
 
-  // Assuming role implies access to workspace. In this case, we'd need to fetch user's registration status.
-  // For now, if they are participant or host, we might show "Open Workspace"
-  // Since we don't have a direct "get registration status" API, we will allow them to navigate if they are logged in.
-  const hasWorkspaceAccess = isAuthenticated && (platformRoles?.includes("PARTICIPANT") || platformRoles?.includes("HOST") || platformRoles?.includes("ADMIN"));
-
-  function handleRegister() {
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
-    // TODO: Connect to proper Registration endpoint
-    // navigate to workspace or open create team modal
-    navigate(`/workspace/${hackathon.id}/overview`);
+  // Determine the correct CTA based on role
+  function getWorkspaceLink() {
+    if (!isAuthenticated) return null;
+    if (platformRoles?.includes("PARTICIPANT")) return `/workspace/${hackathon.id}/team`;
+    return `/workspace/${hackathon.id}/overview`;
   }
 
-  const deadlinePassed = hackathon.registrationEnd ? isPast(hackathon.registrationEnd) : false;
+  const deadlinePassed = hackathon.registrationEnd ? new Date(hackathon.registrationEnd) < new Date() : false;
+  const workspaceLink = getWorkspaceLink();
 
   return (
     <section className="py-14">
       <Container>
         <div className="mb-8 rounded-lg border border-slate-800 bg-slate-900/60 p-6 md:p-8">
           <div className="mb-5 flex flex-wrap items-center gap-3">
-            <Badge>{hackathon.status || "UNKNOWN"}</Badge>
-            <Badge tone="slate">{hackathon.mode || "ONLINE"}</Badge>
+            <Badge>{hackathon.hackathonStatus || "UNKNOWN"}</Badge>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
@@ -107,18 +99,25 @@ export default function HackathonDetailsPage() {
                 Team size: {hackathon.minTeamSize}-{hackathon.maxTeamSize}
               </p>
 
-              {hasWorkspaceAccess ? (
-                <Link to={`/workspace/${hackathon.id}/overview`} className="mt-5 block">
-                  <Button className="w-full">Open Workspace</Button>
+              {workspaceLink ? (
+                <Link to={workspaceLink} className="mt-5 block">
+                  <Button className="w-full">
+                    {platformRoles?.includes("PARTICIPANT") ? "Join / Manage Team →" : "Open Workspace"}
+                  </Button>
                 </Link>
               ) : (
-                <Button
-                  className="mt-5 w-full"
-                  disabled={deadlinePassed}
-                  onClick={handleRegister}
-                >
-                  {deadlinePassed ? "Registration Closed" : "Register Now"}
-                </Button>
+                <>
+                  <Button
+                    className="mt-5 w-full"
+                    disabled={deadlinePassed}
+                    onClick={() => navigate("/login")}
+                  >
+                    {deadlinePassed ? "Registration Closed" : "Login to Participate"}
+                  </Button>
+                  {!deadlinePassed && (
+                    <p className="mt-2 text-center text-xs text-slate-500">Login as a Participant to join</p>
+                  )}
+                </>
               )}
             </div>
           </div>

@@ -1,229 +1,201 @@
-import { useState, useEffect } from "react";
+// src/features/workspace/pages/ParticipantSubmissionPage.jsx
+
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useOutletContext } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { toast } from "react-toastify";
+import { FaGithub, FaGlobe, FaYoutube, FaCheckCircle } from "react-icons/fa";
 
-import { submitProject, getMySubmission } from "../services/workspaceService";
-import PageHeader from "../components/PageHeader";
-import Panel from "../components/Panel";
-import Button from "../../../components/ui/Button";
-import Badge from "../components/Badge";
-import { formatDateTime } from "../../../utils/formatters";
+import { getMyHackathonDetails, submitProject } from "../../participant/services/participantService";
 
-const STATUS_BADGE = {
-  DRAFT: "border-slate-600 text-slate-400",
-  SUBMITTED: "border-emerald-500/30 text-emerald-400",
-  DISQUALIFIED: "border-red-500/30 text-red-400",
-};
+// ─── Schema ───────────────────────────────────────────────────────────────────
+const submissionSchema = z.object({
+    projectTitle: z.string().min(1, "Project title is required."),
+    tagLine:      z.string().min(1, "Tagline is required."),
+    description:  z.string().min(20, "Description must be at least 20 characters."),
+    githubRepoUrl: z.string().url("Must be a valid URL.").optional().or(z.literal("")),
+    liveDemoUrl:   z.string().url("Must be a valid URL.").optional().or(z.literal("")),
+    youtubeUrl:    z.string().url("Must be a valid URL.").optional().or(z.literal("")),
+});
 
-export function ParticipantSubmissionPage() {
-  const { id: hackathonId } = useParams();
-  const { hackathon } = useOutletContext();
+const inputClass = "w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-500 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20";
 
-  const [existingSubmission, setExistingSubmission] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(null);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-
-  const [form, setForm] = useState({
-    projectTitle: "",
-    tagLine: "",
-    description: "",
-    githubRepoUrl: "",
-    liveDemoUrl: "",
-  });
-
-  // Check if the submission deadline has passed
-  const isDeadlinePast = hackathon?.submissionEnd
-    ? new Date() > new Date(hackathon.submissionEnd)
-    : false;
-
-  useEffect(() => {
-    async function fetchExisting() {
-      try {
-        setLoading(true);
-        const data = await getMySubmission(hackathonId);
-        if (data) {
-          setExistingSubmission(data);
-          setForm({
-            projectTitle: data.projectTitle || "",
-            tagLine: data.tagLine || "",
-            description: data.description || "",
-            githubRepoUrl: data.githubRepoUrl || "",
-            liveDemoUrl: data.liveDemoUrl || "",
-          });
-        }
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (hackathonId) fetchExisting();
-  }, [hackathonId]);
-
-  function updateField(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function handleSubmit(event) {
-    event.preventDefault();
-    if (isDeadlinePast) return;
-
-    try {
-      setSubmitting(true);
-      setSubmitError(null);
-
-      const payload = {
-        hackathonId: Number(hackathonId),
-        projectTitle: form.projectTitle.trim(),
-        tagLine: form.tagLine.trim(),
-        description: form.description.trim(),
-        githubRepoUrl: form.githubRepoUrl.trim(),
-        liveDemoUrl: form.liveDemoUrl.trim(),
-      };
-
-      const result = await submitProject(payload);
-      setExistingSubmission(result);
-      setSubmitSuccess(true);
-      setTimeout(() => setSubmitSuccess(false), 4000);
-    } catch (error) {
-      setSubmitError(error.response?.data?.message || "Submission failed. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  if (loading) {
-    return <div className="py-10 text-slate-400">Loading submission...</div>;
-  }
-
-  return (
-    <>
-      <PageHeader
-        eyebrow="Participant"
-        title="Submission Portal"
-        description="Submit your project repository, demo, and description before the deadline. Save as draft anytime."
-      />
-
-      {/* Deadline Banner */}
-      {hackathon?.submissionEnd && (
-        <div className={`mb-6 flex items-center gap-3 rounded-xl border px-4 py-3 text-sm ${
-          isDeadlinePast
-            ? "border-red-500/30 bg-red-500/10 text-red-400"
-            : "border-amber-500/30 bg-amber-500/10 text-amber-300"
-        }`}>
-          <span className="font-semibold">
-            {isDeadlinePast ? "🔒 Submission Closed" : "⏰ Deadline:"}
-          </span>
-          <span>{formatDateTime(hackathon.submissionEnd)}</span>
+function Field({ label, icon: Icon, error, hint, textarea, ...rest }) {
+    return (
+        <div>
+            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-300">
+                {Icon && <Icon size={13} className="text-slate-500" />}
+                {label}
+            </label>
+            {textarea ? (
+                <textarea rows={4} className={inputClass} {...rest} />
+            ) : (
+                <input className={inputClass} {...rest} />
+            )}
+            {hint && !error && <p className="mt-1 text-xs text-slate-500">{hint}</p>}
+            {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
         </div>
-      )}
+    );
+}
 
-      <Panel
-        title={existingSubmission ? `Project: ${existingSubmission.projectTitle}` : "Your Project Submission"}
-        actions={
-          existingSubmission && (
-            <span className={`rounded-full border px-3 py-1 text-xs font-medium ${STATUS_BADGE[existingSubmission.submissionStatus] || STATUS_BADGE.DRAFT}`}>
-              {existingSubmission.submissionStatus}
-            </span>
-          )
+// ─── Success panel ────────────────────────────────────────────────────────────
+function SuccessPanel({ submission }) {
+    return (
+        <div className="rounded-2xl border border-emerald-800/40 bg-emerald-900/20 p-6 text-center">
+            <FaCheckCircle className="mx-auto mb-3 text-emerald-400" size={36} />
+            <h2 className="text-xl font-bold text-white">Project Submitted!</h2>
+            <p className="mt-2 text-sm text-slate-300">Your project has been submitted successfully.</p>
+
+            <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900/60 p-4 text-left space-y-2">
+                <p className="text-xs text-slate-500">Submission ID #{submission.projectSubmissionId}</p>
+                <p className="text-lg font-bold text-white">{submission.projectTitle}</p>
+                <p className="text-sm text-indigo-300 italic">{submission.tagLine}</p>
+                {submission.githubRepoUrl && (
+                    <a href={submission.githubRepoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-blue-400 hover:underline">
+                        <FaGithub size={13} /> GitHub Repository
+                    </a>
+                )}
+                {submission.liveDemoUrl && (
+                    <a href={submission.liveDemoUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-sm text-blue-400 hover:underline">
+                        <FaGlobe size={13} /> Live Demo
+                    </a>
+                )}
+                <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-900/40 border border-emerald-700/40 px-3 py-1 text-xs font-semibold text-emerald-300">
+                    Status: {submission.submissionStatus}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ─── Main export ──────────────────────────────────────────────────────────────
+export function ParticipantSubmissionPage() {
+    const { id } = useParams();
+    const [teamId, setTeamId] = useState(null);
+    const [isLoadingTeam, setIsLoadingTeam] = useState(true);
+    const [submission, setSubmission] = useState(null);
+
+    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+        resolver: zodResolver(submissionSchema),
+    });
+
+    useEffect(() => {
+        getMyHackathonDetails(id)
+            .then((data) => {
+                if (data?.teamDetails?.teamId) {
+                    setTeamId(data.teamDetails.teamId);
+                }
+            })
+            .catch((err) => toast.error(err.message))
+            .finally(() => setIsLoadingTeam(false));
+    }, [id]);
+
+    async function onSubmit(data) {
+        if (!teamId) {
+            toast.error("You need a team before submitting. Go to the Team tab first.");
+            return;
         }
-      >
-        <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Project Title */}
-            <div className="md:col-span-2">
-              <label className="mb-1.5 block text-sm font-medium text-slate-300">Project Title *</label>
-              <input
-                value={form.projectTitle}
-                onChange={(e) => updateField("projectTitle", e.target.value)}
-                placeholder="e.g. MediTrack — AI-powered health monitor"
-                disabled={isDeadlinePast}
-                required
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20 disabled:cursor-not-allowed disabled:opacity-50"
-              />
+        try {
+            const result = await submitProject({ teamId, ...data });
+            setSubmission(result);
+            toast.success("Project submitted successfully!");
+        } catch (err) {
+            toast.error(err.message);
+        }
+    }
+
+    return (
+        <div>
+            <div className="mb-6">
+                <p className="text-sm font-semibold uppercase tracking-widest text-indigo-400">Participant</p>
+                <h1 className="mt-1 text-2xl font-bold text-white">Project Submission</h1>
+                <p className="mt-1 text-sm text-slate-400">Submit your team's final project for judging.</p>
             </div>
 
-            {/* Tagline */}
-            <div className="md:col-span-2">
-              <label className="mb-1.5 block text-sm font-medium text-slate-300">Tagline</label>
-              <input
-                value={form.tagLine}
-                onChange={(e) => updateField("tagLine", e.target.value)}
-                placeholder="A short one-liner about your project"
-                disabled={isDeadlinePast}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
+            {isLoadingTeam ? (
+                <div className="animate-pulse space-y-4">
+                    {[1, 2, 3].map((k) => <div key={k} className="h-16 rounded-xl bg-slate-900 border border-slate-800" />)}
+                </div>
+            ) : !teamId ? (
+                <div className="rounded-2xl border border-amber-800/40 bg-amber-900/10 p-6 text-center">
+                    <p className="text-amber-300 font-semibold">You need a team to submit a project.</p>
+                    <p className="mt-1 text-sm text-slate-400">Please create or join a team first from the Team tab.</p>
+                </div>
+            ) : submission ? (
+                <SuccessPanel submission={submission} />
+            ) : (
+                <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
-            {/* GitHub URL */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-300">GitHub Repository URL *</label>
-              <input
-                value={form.githubRepoUrl}
-                onChange={(e) => updateField("githubRepoUrl", e.target.value)}
-                placeholder="https://github.com/team/project"
-                disabled={isDeadlinePast}
-                required
-                type="url"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
+                        <Field
+                            label="Project Title *"
+                            type="text"
+                            placeholder="e.g. EcoChain — Blockchain for sustainability tracking"
+                            error={errors.projectTitle?.message}
+                            {...register("projectTitle")}
+                        />
 
-            {/* Live Demo URL */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-slate-300">Live Demo URL</label>
-              <input
-                value={form.liveDemoUrl}
-                onChange={(e) => updateField("liveDemoUrl", e.target.value)}
-                placeholder="https://your-demo-link.vercel.app"
-                disabled={isDeadlinePast}
-                type="url"
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20 disabled:cursor-not-allowed disabled:opacity-50"
-              />
-            </div>
-          </div>
+                        <Field
+                            label="Tagline *"
+                            type="text"
+                            placeholder="A one-liner that captures your project"
+                            error={errors.tagLine?.message}
+                            {...register("tagLine")}
+                        />
 
-          {/* Description */}
-          <div>
-            <label className="mb-1.5 block text-sm font-medium text-slate-300">Project Description *</label>
-            <textarea
-              value={form.description}
-              onChange={(e) => updateField("description", e.target.value)}
-              placeholder="Explain the problem you solved, how it works, your tech stack, and what makes it unique..."
-              disabled={isDeadlinePast}
-              rows={6}
-              required
-              className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-sky-400 focus:ring-1 focus:ring-sky-400/20 disabled:cursor-not-allowed disabled:opacity-50"
-            />
-          </div>
+                        <Field
+                            label="Description *"
+                            textarea
+                            placeholder="Describe what you built, the problem it solves, technologies used..."
+                            error={errors.description?.message}
+                            {...register("description")}
+                        />
 
-          {submitError && (
-            <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-              {submitError}
-            </div>
-          )}
+                        <div className="border-t border-slate-800 pt-5">
+                            <p className="mb-4 text-sm font-semibold text-slate-300">Links <span className="font-normal text-slate-500">(optional)</span></p>
+                            <div className="space-y-4">
+                                <Field
+                                    label="GitHub Repository"
+                                    icon={FaGithub}
+                                    type="url"
+                                    placeholder="https://github.com/your-org/your-repo"
+                                    error={errors.githubRepoUrl?.message}
+                                    {...register("githubRepoUrl")}
+                                />
+                                <Field
+                                    label="Live Demo URL"
+                                    icon={FaGlobe}
+                                    type="url"
+                                    placeholder="https://your-demo.vercel.app"
+                                    error={errors.liveDemoUrl?.message}
+                                    {...register("liveDemoUrl")}
+                                />
+                                <Field
+                                    label="YouTube Demo Video"
+                                    icon={FaYoutube}
+                                    type="url"
+                                    placeholder="https://youtube.com/watch?v=..."
+                                    error={errors.youtubeUrl?.message}
+                                    {...register("youtubeUrl")}
+                                />
+                            </div>
+                        </div>
 
-          {submitSuccess && (
-            <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-400">
-              ✓ Submission saved successfully!
-            </div>
-          )}
-
-          <Button
-            disabled={isDeadlinePast || submitting}
-            className="w-full"
-          >
-            {isDeadlinePast
-              ? "🔒 Submission Closed"
-              : submitting
-              ? "Submitting..."
-              : existingSubmission
-              ? "Update Submission"
-              : "Submit Project 🚀"
-            }
-          </Button>
-        </form>
-      </Panel>
-    </>
-  );
+                        <div className="border-t border-slate-800 pt-5 flex items-center justify-between gap-4">
+                            <p className="text-xs text-slate-500">Team #{teamId} • Submitting will not block re-submission.</p>
+                            <button
+                                type="submit"
+                                disabled={isSubmitting}
+                                className="rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50"
+                            >
+                                {isSubmitting ? "Submitting..." : "Submit Project"}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            )}
+        </div>
+    );
 }

@@ -65,6 +65,40 @@ export default function HostStep1BasicInfo() {
                 {errors.description && <p className="mt-1 text-xs text-red-400">{errors.description}</p>}
             </div>
 
+            {/* FAQ */}
+            <div>
+                <label className="block text-sm font-semibold mb-2 text-white">
+                    FAQ <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                    value={formData.faq}
+                    onChange={(e) => handleChange("faq", e.target.value)}
+                    placeholder="Enter frequently asked questions and their answers..."
+                    rows={4}
+                    maxLength={1000}
+                    className="w-full resize-none rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-indigo-500"
+                />
+                <p className="mt-1 text-xs text-slate-500">{formData.faq?.length || 0}/1000</p>
+                {errors.faq && <p className="mt-1 text-xs text-red-400">{errors.faq}</p>}
+            </div>
+
+            {/* Rules */}
+            <div>
+                <label className="block text-sm font-semibold mb-2 text-white">
+                    Rules <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                    value={formData.rules}
+                    onChange={(e) => handleChange("rules", e.target.value)}
+                    placeholder="State the rules for participants..."
+                    rows={4}
+                    maxLength={2000}
+                    className="w-full resize-none rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-indigo-500"
+                />
+                <p className="mt-1 text-xs text-slate-500">{formData.rules?.length || 0}/2000</p>
+                {errors.rules && <p className="mt-1 text-xs text-red-400">{errors.rules}</p>}
+            </div>
+
             {/* Images */}
             <div className="grid gap-6 md:grid-cols-2">
                 <ImageUploadField
