@@ -179,6 +179,8 @@ export async function getHackathonResult(hackathonId) {
 export async function getHackathonWinners(hackathonId) {
     try {
         const response = await api.get(`/participants/hackathon/${hackathonId}/winners`);
+        // console.log(data.data);
+
         return response.data.data;
     } catch (error) {
         throw new Error(error.response?.data?.message || "Failed to fetch winners.");

@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useOutletContext, Link } from "react-router";
 import { FaCalendarAlt, FaUsers, FaShieldAlt, FaArrowRight, FaPlusCircle } from "react-icons/fa";
 
-import { getMyHackathonDetails } from "../../participant/services/participantService";
+import { getMyHackathonDetails, getHackathonResult, getHackathonWinners } from "../../participant/services/participantService";
+import { FaTrophy, FaMedal } from "react-icons/fa";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
@@ -51,13 +52,51 @@ function QuickLink({ to, label }) {
 }
 
 // ─── Participant overview ─────────────────────────────────────────────────────
-function ParticipantOverview({ hackathon, details }) {
+function ParticipantOverview({ hackathon, details, result }) {
     const { id } = useParams();
     const teamDetails = details?.teamDetails;
     const hackathonData = details?.hackathonDetails || hackathon;
 
     return (
         <div className="space-y-6">
+            {/* Hackathon Results Card */}
+            {result && (
+                <div className="rounded-2xl border border-indigo-800/40 bg-indigo-900/10 p-6 relative overflow-hidden shadow-lg shadow-indigo-900/5">
+                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
+
+                    <h2 className="mb-4 text-xl font-bold text-white flex items-center gap-2">
+                        <FaTrophy className="text-amber-400" /> Evaluation Results
+                    </h2>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 flex flex-col justify-center shadow-inner">
+                            <p className="text-sm text-slate-400 font-semibold tracking-wide uppercase mb-1">Total Score</p>
+                            <p className="text-4xl font-black text-white tabular-nums tracking-tight">
+                                {result.totalScore ?? result.score ?? "—"}
+                            </p>
+                        </div>
+                        <div className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 flex flex-col justify-center shadow-inner">
+                            <p className="text-sm text-slate-400 font-semibold tracking-wide uppercase mb-1">Status</p>
+                            {(result.isWinner || result.categoryName || result.category) ? (
+                                <div>
+                                    <p className="text-2xl font-bold text-emerald-400 drop-shadow-sm">Winner! 🎉</p>
+                                    {(result.categoryName || result.category) && (
+                                        <span className="inline-block mt-2 rounded-full bg-emerald-900/40 border border-emerald-700/40 px-3 py-1 text-xs font-bold text-emerald-300 shadow-sm">
+                                            {result.categoryName || result.category}
+                                        </span>
+                                    )}
+                                </div>
+                            ) : (
+                                <div>
+                                    <p className="text-2xl font-bold text-slate-200">Participant</p>
+                                    <p className="mt-1 text-xs text-slate-400">Great effort! Keep building.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Team card */}
             {!teamDetails ? (
                 <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-8 text-center">
@@ -158,22 +197,85 @@ function OrganizerOverview({ hackathon }) {
     );
 }
 
+// ─── Winners Board ──────────────────────────────────────────────────────────────
+function WinnersBoard({ winners, status }) {
+    const isDeclared = (status === "PUBLISHED" || status === "COMPLETED") && winners && winners.length > 0;
+
+    if (!isDeclared) {
+        return (
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-6 relative overflow-hidden shadow-lg mt-8">
+                <h2 className="mb-6 text-xl font-bold text-slate-300 flex items-center gap-2">
+                    <FaMedal className="text-slate-500 text-2xl" /> Hall of Fame
+                </h2>
+                <div className="rounded-xl border border-dashed border-slate-700 bg-slate-900/50 p-8 text-center">
+                    <p className="text-slate-400 font-medium text-lg">Results are not declared yet.</p>
+                    <p className="text-sm text-slate-500 mt-1">Check back later once the evaluation is complete and published.</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="rounded-2xl border border-amber-800/40 bg-amber-900/10 p-6 relative overflow-hidden shadow-lg mt-8">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+
+            <h2 className="mb-6 text-xl font-bold text-white flex items-center gap-2">
+                <FaMedal className="text-amber-400 text-2xl" /> Hall of Fame
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {winners.map((winner, idx) => (
+                    <div key={idx} className="rounded-xl border border-slate-800 bg-slate-900/80 p-5 flex flex-col justify-center shadow-inner relative overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-900/20">
+                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
+                        <p className="text-sm text-amber-400 font-bold uppercase tracking-widest mb-3 flex items-center gap-2 drop-shadow-sm">
+                            <FaTrophy size={14} /> {winner.categoryName || "Winner"}
+                        </p>
+                        <h3 className="text-xl font-black text-white tracking-tight drop-shadow-sm line-clamp-2">
+                            {winner.projectTitle || winner.projectName || "Winning Project"}
+                        </h3>
+                        <p className="text-sm text-slate-400 mt-2">
+                            Team: <span className="text-slate-200 font-semibold">{winner.teamName || "N/A"}</span>
+                        </p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 // ─── Main export ──────────────────────────────────────────────────────────────
 export function WorkspaceOverviewPage() {
     const { id } = useParams();
     const { role, hackathon } = useOutletContext();
     const [details, setDetails] = useState(null);
+    const [result, setResult] = useState(null);
+    const [winners, setWinners] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (role === "PARTICIPANT") {
             setIsLoading(true);
-            getMyHackathonDetails(id)
-                .then(setDetails)
-                .catch(console.warn)
+            Promise.allSettled([
+                getMyHackathonDetails(id),
+                getHackathonResult(id)
+            ])
+                .then(([detailsRes, resultRes]) => {
+                    if (detailsRes.status === "fulfilled") setDetails(detailsRes.value);
+                    if (resultRes.status === "fulfilled" && resultRes.value) setResult(resultRes.value);
+                })
                 .finally(() => setIsLoading(false));
         }
     }, [id, role]);
+
+    useEffect(() => {
+        if (hackathon?.hackathonStatus === "PUBLISHED") {
+            getHackathonWinners(id)
+                .then((data) => {
+                    if (Array.isArray(data)) setWinners(data);
+                })
+                .catch(console.warn);
+        }
+    }, [id, hackathon?.hackathonStatus]);
 
     return (
         <div className="space-y-6">
@@ -243,10 +345,13 @@ export function WorkspaceOverviewPage() {
                     ))}
                 </div>
             ) : role === "PARTICIPANT" ? (
-                <ParticipantOverview hackathon={hackathon} details={details} />
+                <ParticipantOverview hackathon={hackathon} details={details} result={result} />
             ) : (
                 <OrganizerOverview hackathon={hackathon} />
             )}
+
+            {/* Winners Board */}
+            <WinnersBoard winners={winners} status={hackathon?.hackathonStatus} />
         </div>
     );
 }
