@@ -4,12 +4,8 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-<<<<<<< Updated upstream
-import { getAdminMetrics, getPendingHackathons, approveHackathon, rejectHackathon, banUser } from "../services/adminService";
-import Navbar from "../../../components/layout/Navbar";
-=======
 import { getAdminMetrics, getPendingHackathons, approveHackathon, rejectHackathon, banUser, unbanUser } from "../services/adminService";
->>>>>>> Stashed changes
+import Navbar from "../../../components/layout/Navbar";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
