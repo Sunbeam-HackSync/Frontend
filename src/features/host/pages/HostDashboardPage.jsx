@@ -8,12 +8,12 @@ import { getHostHackathons } from "../services/hostService";
 
 // ─── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CONFIG = {
-  DRAFT:     { color: "bg-amber-900/40 text-amber-300 border-amber-700/40",     dot: "bg-amber-400" },
-  APPROVED:  { color: "bg-emerald-900/40 text-emerald-300 border-emerald-700/40", dot: "bg-emerald-400" },
-  REJECTED:  { color: "bg-red-900/40 text-red-300 border-red-700/40",           dot: "bg-red-400" },
-  PUBLISHED: { color: "bg-indigo-900/40 text-indigo-300 border-indigo-700/40",  dot: "bg-indigo-400" },
-  ACTIVE:    { color: "bg-blue-900/40 text-blue-300 border-blue-700/40",        dot: "bg-blue-400" },
-  COMPLETED: { color: "bg-slate-700/40 text-slate-300 border-slate-600/40",     dot: "bg-slate-400" },
+  DRAFT: { color: "bg-amber-900/40 text-amber-300 border-amber-700/40", dot: "bg-amber-400" },
+  APPROVED: { color: "bg-emerald-900/40 text-emerald-300 border-emerald-700/40", dot: "bg-emerald-400" },
+  REJECTED: { color: "bg-red-900/40 text-red-300 border-red-700/40", dot: "bg-red-400" },
+  PUBLISHED: { color: "bg-indigo-900/40 text-indigo-300 border-indigo-700/40", dot: "bg-indigo-400" },
+  ACTIVE: { color: "bg-blue-900/40 text-blue-300 border-blue-700/40", dot: "bg-blue-400" },
+  COMPLETED: { color: "bg-slate-700/40 text-slate-300 border-slate-600/40", dot: "bg-slate-400" },
 };
 
 function StatusBadge({ status }) {
@@ -90,18 +90,12 @@ function HackathonCard({ hackathon }) {
         </p>
 
         {/* Actions */}
-        <div className="mt-auto pt-5 flex gap-2">
-          <button
-            onClick={() => navigate(`/workspace/${hackathon.id}/overview`)}
-            className="flex-1 rounded-xl bg-indigo-600 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500"
-          >
-            Workspace
-          </button>
+        <div className="mt-auto pt-5 flex">
           <button
             onClick={() => navigate(`/host/hackathon/${hackathon.id}/manage`)}
-            className="flex-1 rounded-xl border border-slate-700 bg-slate-800 py-2 text-xs font-semibold text-slate-300 transition hover:border-slate-600 hover:text-white"
+            className="flex-1 rounded-xl bg-indigo-600/10 border border-indigo-500/30 py-2.5 text-sm font-bold text-indigo-400 shadow-sm transition-all hover:bg-indigo-600 hover:text-white hover:border-indigo-500 hover:shadow-indigo-600/20 hover:-translate-y-0.5 cursor-pointer"
           >
-            Manage
+            Manage Hackathon
           </button>
         </div>
       </div>

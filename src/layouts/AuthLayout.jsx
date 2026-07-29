@@ -1,11 +1,9 @@
 // src/layouts/AuthLayout.jsx 
 
 import { Outlet } from "react-router";
-
 import { useSelector } from "react-redux";
-
 import { Navigate } from "react-router";
-
+import Navbar from "../components/layout/Navbar";
 
 export default function AuthLayout() {
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -15,18 +13,11 @@ export default function AuthLayout() {
     }
 
     return (
-        <div
-            className="
-                min-h-screen
-                bg-slate-950
-                text-white
-                grid
-                lg:grid-cols-2
-            "
-        >
-
-            <Outlet />
-
+        <div className="min-h-screen flex flex-col bg-slate-950 text-white">
+            <Navbar />
+            <div className="flex-1 grid lg:grid-cols-2">
+                <Outlet />
+            </div>
         </div>
     );
 }
