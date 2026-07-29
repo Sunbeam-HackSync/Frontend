@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 
-import { getAdminMetrics, getPendingHackathons, approveHackathon, rejectHackathon, banUser } from "../services/adminService";
+import { getAdminMetrics, getPendingHackathons, approveHackathon, rejectHackathon, banUser, unbanUser } from "../services/adminService";
 import Navbar from "../../../components/layout/Navbar";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
@@ -79,8 +79,9 @@ export default function AdminDashboard() {
   const [actionLoadingId, setActionLoadingId] = useState(null);
 
   // Ban user state
-  const [banUserId, setBanUserId] = useState("");
+  const [banUserEmail, setBanUserEmail] = useState("");
   const [isBanning, setIsBanning] = useState(false);
+  const [isUnbanning, setIsUnbanning] = useState(false);
 
   async function loadMetrics() {
     try {
@@ -137,20 +138,38 @@ export default function AdminDashboard() {
   }
 
   async function handleBanUser() {
-    const id = parseInt(banUserId);
-    if (!id || id <= 0) {
-      toast.error("Please enter a valid numeric user ID.");
+    const email = banUserEmail.trim();
+    if (!email) {
+      toast.error("Please enter a valid user email.");
       return;
     }
     setIsBanning(true);
     try {
-      const bannedUser = await banUser(id);
-      toast.success(`User ${bannedUser?.email || `#${id}`} has been banned.`);
-      setBanUserId("");
+      const bannedUser = await banUser(email);
+      toast.success(`User ${bannedUser?.email || email} has been banned.`);
+      setBanUserEmail("");
     } catch (err) {
       toast.error(err.message);
     } finally {
       setIsBanning(false);
+    }
+  }
+
+  async function handleUnbanUser() {
+    const email = banUserEmail.trim();
+    if (!email) {
+      toast.error("Please enter a valid user email.");
+      return;
+    }
+    setIsUnbanning(true);
+    try {
+      const unbannedUser = await unbanUser(email);
+      toast.success(`User ${unbannedUser?.email || email} has been unbanned.`);
+      setBanUserEmail("");
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsUnbanning(false);
     }
   }
 
@@ -282,26 +301,35 @@ export default function AdminDashboard() {
           {/* ── Right sidebar ──────────────────────────────────── */}
           <div className="space-y-6">
 
-            {/* Ban User */}
+            {/* Ban/Unban User */}
             <div className="rounded-xl border border-slate-800 bg-slate-900 p-5">
-              <h3 className="font-bold text-white mb-1">Ban User</h3>
+              <h3 className="font-bold text-white mb-1">Ban/Unban User</h3>
               <p className="text-xs text-slate-400 mb-4">
-                Enter a numeric user ID to immediately ban a user from the platform.
+                Enter a user email to ban or unban them from the platform.
               </p>
               <input
-                type="number"
-                value={banUserId}
-                onChange={(e) => setBanUserId(e.target.value)}
-                placeholder="User ID (e.g. 8)"
+                type="email"
+                value={banUserEmail}
+                onChange={(e) => setBanUserEmail(e.target.value)}
+                placeholder="User Email (e.g. user@example.com)"
                 className="mb-3 w-full rounded-lg border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-red-500 transition"
               />
-              <button
-                onClick={handleBanUser}
-                disabled={isBanning || !banUserId}
-                className="w-full rounded-lg bg-red-700/70 border border-red-600/50 px-4 py-2.5 text-sm font-semibold text-red-200 transition hover:bg-red-700 disabled:opacity-50"
-              >
-                {isBanning ? "Banning..." : "Ban User"}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleBanUser}
+                  disabled={isBanning || isUnbanning || !banUserEmail}
+                  className="flex-1 rounded-lg bg-red-700/70 border border-red-600/50 px-4 py-2.5 text-sm font-semibold text-red-200 transition hover:bg-red-700 disabled:opacity-50"
+                >
+                  {isBanning ? "Banning..." : "Ban"}
+                </button>
+                <button
+                  onClick={handleUnbanUser}
+                  disabled={isBanning || isUnbanning || !banUserEmail}
+                  className="flex-1 rounded-lg bg-emerald-700/70 border border-emerald-600/50 px-4 py-2.5 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-700 disabled:opacity-50"
+                >
+                  {isUnbanning ? "Unbanning..." : "Unban"}
+                </button>
+              </div>
             </div>
 
             {/* Quick stats recap */}

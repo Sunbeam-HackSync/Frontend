@@ -48,12 +48,22 @@ export async function rejectHackathon(id) {
   }
 }
 
-/** Ban a user by their numeric ID. */
-export async function banUser(id) {
+/** Ban a user by their email. */
+export async function banUser(email) {
   try {
-    const response = await api.put(`/admin/users/${id}/ban`);
+    const response = await api.put(`/admin/users/${email}/ban`);
     return response.data.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Failed to ban user.");
+  }
+}
+
+/** Unban a user by their email. */
+export async function unbanUser(email) {
+  try {
+    const response = await api.put(`/admin/users/${email}/unban`);
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Failed to unban user.");
   }
 }

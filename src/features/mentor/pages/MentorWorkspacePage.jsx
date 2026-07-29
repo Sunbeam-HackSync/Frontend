@@ -41,8 +41,10 @@ export default function MentorWorkspacePage() {
         webSocketService.connect(() => {
             // Subscribe to global tickets topic
             webSocketService.subscribe('/topic/tickets', (message) => {
-                // Whenever a ticket is created or claimed, refresh the lists
-                fetchTickets();
+                // Add a small delay to ensure backend DB transaction has committed
+                setTimeout(() => {
+                    fetchTickets();
+                }, 500);
             });
         }, (error) => {
             console.error("WebSocket connection failed", error);
@@ -116,7 +118,7 @@ export default function MentorWorkspacePage() {
                 <div className="flex-1 overflow-x-auto p-6 flex gap-6 items-start">
                     
                     {/* OPEN COLUMN */}
-                    <div className="flex flex-col flex-1 min-w-[320px] max-w-sm rounded-2xl border border-slate-800 bg-slate-900/30 overflow-hidden max-h-full">
+                    <div className="flex flex-col flex-1 min-w-[320px] rounded-2xl border border-slate-800 bg-slate-900/30 overflow-hidden max-h-full">
                         <div className="p-4 border-b border-slate-800 bg-slate-900/80 flex justify-between items-center shrink-0">
                             <h3 className="font-bold flex items-center gap-2">
                                 <FaExclamationCircle className="text-amber-400" /> Open Requests
@@ -155,7 +157,7 @@ export default function MentorWorkspacePage() {
                     </div>
 
                     {/* CLAIMED COLUMN */}
-                    <div className="flex flex-col flex-1 min-w-[320px] max-w-sm rounded-2xl border border-slate-800 bg-slate-900/30 overflow-hidden max-h-full">
+                    <div className="flex flex-col flex-1 min-w-[320px] rounded-2xl border border-slate-800 bg-slate-900/30 overflow-hidden max-h-full">
                         <div className="p-4 border-b border-slate-800 bg-slate-900/80 flex justify-between items-center shrink-0">
                             <h3 className="font-bold flex items-center gap-2">
                                 <FaTicketAlt className="text-sky-400" /> My Sessions
@@ -197,7 +199,7 @@ export default function MentorWorkspacePage() {
                     </div>
 
                     {/* RESOLVED COLUMN */}
-                    <div className="flex flex-col flex-1 min-w-[320px] max-w-sm rounded-2xl border border-slate-800 bg-slate-900/30 overflow-hidden max-h-full opacity-70">
+                    <div className="flex flex-col flex-1 min-w-[320px] rounded-2xl border border-slate-800 bg-slate-900/30 overflow-hidden max-h-full opacity-70">
                         <div className="p-4 border-b border-slate-800 bg-slate-900/80 flex justify-between items-center shrink-0">
                             <h3 className="font-bold flex items-center gap-2 text-slate-400">
                                 <FaCheckCircle className="text-emerald-500" /> Resolved

@@ -95,7 +95,7 @@ function CreateTeamPanel({ hackathonId, onCreated }) {
 }
 
 // ─── Team Management Panel ────────────────────────────────────────────────────
-function TeamManagementPanel({ teamDetails, userEmail, onUpdated }) {
+function TeamManagementPanel({ teamDetails, userEmail, onUpdated, isCompleted }) {
     const isLeader = teamDetails?.participants?.some(p => p.email === userEmail && p.teamLeader);
 
     const addMemberForm = useForm({ resolver: zodResolver(addMemberSchema) });
@@ -176,7 +176,7 @@ function TeamManagementPanel({ teamDetails, userEmail, onUpdated }) {
             </div>
 
             {/* Add member (leader only) */}
-            {isLeader && (
+            {isLeader && !isCompleted && (
                 <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
                     <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-white">
                         <FaUserPlus size={14} className="text-indigo-400" />
@@ -203,7 +203,7 @@ function TeamManagementPanel({ teamDetails, userEmail, onUpdated }) {
             )}
 
             {/* Update team settings (leader only) */}
-            {isLeader && (
+            {isLeader && !isCompleted && (
                 <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
                     <h3 className="mb-4 flex items-center gap-2 text-base font-bold text-white">
                         <FaEdit size={14} className="text-indigo-400" />
@@ -266,6 +266,9 @@ export function ParticipantTeamPage() {
         );
     }
 
+    const hackathonStatus = details?.hackathonDetails?.hackathonStatus;
+    const isCompleted = hackathonStatus === 'COMPLETED';
+
     return (
         <div>
             <div className="mb-6">
@@ -273,13 +276,20 @@ export function ParticipantTeamPage() {
                 <h1 className="mt-1 text-2xl font-bold text-white">Team Management</h1>
             </div>
 
+            {isCompleted && (
+                <div className="mb-6 rounded-xl border border-amber-800/40 bg-amber-900/10 p-4 text-amber-300 font-medium">
+                    This hackathon has ended. Team management is disabled.
+                </div>
+            )}
+
             {teamDetails ? (
                 <TeamManagementPanel
                     teamDetails={teamDetails}
                     userEmail={user?.email}
                     onUpdated={loadDetails}
+                    isCompleted={isCompleted}
                 />
-            ) : (
+            ) : isCompleted ? null : (
                 <CreateTeamPanel
                     hackathonId={hackathonId}
                     onCreated={loadDetails}

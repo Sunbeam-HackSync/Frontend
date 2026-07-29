@@ -63,6 +63,15 @@ api.interceptors.response.use(
       }
     }
 
+    // Handle banned user exception
+    if (error.response?.status === 403 && error.response?.data?.message?.toLowerCase().includes("banned")) {
+      Cookies.remove('token');
+      localStorage.removeItem('user');
+      localStorage.removeItem('hackforge_auth');
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
+
     // Global Error Handling for Server Errors (500) or Network Errors
     if (!error.response) {
       toast.error("Network error. Please check your connection.");

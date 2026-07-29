@@ -21,11 +21,11 @@ import {
 
 // ─── Status badge ──────────────────────────────────────────────────────────────
 const STATUS_COLORS = {
-  DRAFT:     "bg-amber-900/40 text-amber-300 border-amber-700/40",
-  APPROVED:  "bg-emerald-900/40 text-emerald-300 border-emerald-700/40",
-  REJECTED:  "bg-red-900/40 text-red-300 border-red-700/40",
+  DRAFT: "bg-amber-900/40 text-amber-300 border-amber-700/40",
+  APPROVED: "bg-emerald-900/40 text-emerald-300 border-emerald-700/40",
+  REJECTED: "bg-red-900/40 text-red-300 border-red-700/40",
   PUBLISHED: "bg-indigo-900/40 text-indigo-300 border-indigo-700/40",
-  ACTIVE:    "bg-blue-900/40 text-blue-300 border-blue-700/40",
+  ACTIVE: "bg-blue-900/40 text-blue-300 border-blue-700/40",
   COMPLETED: "bg-slate-700/40 text-slate-300 border-slate-600/40",
 };
 
@@ -75,7 +75,7 @@ function InviteForm({ title, description, onInvite, placeholder = "user@example.
     <div className={`rounded-2xl border border-slate-800 bg-slate-900 p-6 ${disabled ? 'opacity-70' : ''}`}>
       <h3 className="text-lg font-bold text-white mb-1">{title}</h3>
       <p className="text-sm text-slate-400 mb-5">{description}</p>
-      
+
       {disabled ? (
         <div className="rounded-xl border border-amber-800/40 bg-amber-900/20 px-4 py-3 mb-4">
           <p className="text-xs text-amber-300 font-medium">{disabledReason}</p>
@@ -226,35 +226,35 @@ export default function HostManagePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isPublishing, setIsPublishing] = useState(false);
   const [activeTab, setActiveTab] = useState("OVERVIEW");
-  
+
   const [editingCriteria, setEditingCriteria] = useState(null);
 
   async function load() {
+    try {
+      const basicData = await getHostHackathonById(id);
+      let fullDataList = [];
       try {
-        const basicData = await getHostHackathonById(id);
-        let fullDataList = [];
-        try {
-          fullDataList = await getHostHackathonDetails();
-        } catch (e) {
-          console.warn("Could not fetch full rosters", e);
-        }
-        const fullData = fullDataList.find(h => h.id.toString() === id.toString()) || {};
-        
-        let criteriaList = [];
-        try {
-          criteriaList = await getEvaluationCriteria(id);
-        } catch (e) {
-          console.warn("Could not fetch evaluation criteria", e);
-        }
-
-        setHackathon({ ...basicData, ...fullData, criteria: criteriaList });
-      } catch (err) {
-        toast.error(err.message);
-      } finally {
-        setIsLoading(false);
+        fullDataList = await getHostHackathonDetails();
+      } catch (e) {
+        console.warn("Could not fetch full rosters", e);
       }
+      const fullData = fullDataList.find(h => h.id.toString() === id.toString()) || {};
+
+      let criteriaList = [];
+      try {
+        criteriaList = await getEvaluationCriteria(id);
+      } catch (e) {
+        console.warn("Could not fetch evaluation criteria", e);
+      }
+
+      setHackathon({ ...basicData, ...fullData, criteria: criteriaList });
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsLoading(false);
     }
-  
+  }
+
   useEffect(() => {
     load();
   }, [id]);
@@ -267,21 +267,21 @@ export default function HostManagePage() {
       toast.success("Results published successfully!");
       setHackathon((prev) => ({ ...prev, hackathonStatus: "PUBLISHED" }));
     } catch (err) {
-      toast.error(err.message); 
+      toast.error(err.message);
     } finally {
       setIsPublishing(false);
     }
   }
 
-  async function handleAssignSuperJudge(judgeUserId) {
+  async function handleAssignSuperJudge(judgeEmail) {
     if (!window.confirm("Assign as Super Judge?")) return;
     try {
-      await assignSuperJudge(id, judgeUserId);
+      await assignSuperJudge(id, judgeEmail);
       toast.success("Super Judge assigned!");
       // Optimistically update
       setHackathon(prev => ({
         ...prev,
-        judges: prev.judges?.map(j => j.userId === judgeUserId ? { ...j, isSuperJudge: true } : j)
+        judges: prev.judges?.map(j => j.email === judgeEmail ? { ...j, isSuperJudge: true } : j)
       }));
     } catch (err) {
       toast.error(err.message);
@@ -473,7 +473,7 @@ export default function HostManagePage() {
                               </div>
                             </div>
                             {!judge.isSuperJudge && judge.status === 'ACCEPTED' && (
-                              <button onClick={() => handleAssignSuperJudge(judge.userId)} className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-900/30 px-3 py-1.5 rounded-lg border border-indigo-500/20 hover:border-indigo-500/40">
+                              <button onClick={() => handleAssignSuperJudge(judge.email)} className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors bg-indigo-900/30 px-3 py-1.5 rounded-lg border border-indigo-500/20 hover:border-indigo-500/40">
                                 Make Super Judge
                               </button>
                             )}
@@ -553,7 +553,7 @@ export default function HostManagePage() {
                   <div className="bg-indigo-900/20 border border-indigo-900/50 rounded-xl p-4 text-sm text-indigo-200">
                     Review project submissions from registered teams. You can disqualify submissions that violate the hackathon rules.
                   </div>
-                  
+
                   {hackathon.submissions?.length > 0 ? (
                     <div className="grid gap-4">
                       {hackathon.submissions.map(sub => (
@@ -567,7 +567,7 @@ export default function HostManagePage() {
                             </div>
                             <p className="text-sm text-indigo-300 mb-3">{sub.tagLine}</p>
                             <p className="text-sm text-slate-400 mb-4 line-clamp-2">{sub.description}</p>
-                            
+
                             <div className="flex flex-wrap gap-3">
                               {sub.githubRepoUrl && (
                                 <a href={sub.githubRepoUrl} target="_blank" rel="noreferrer" className="text-xs font-semibold text-slate-300 hover:text-white transition-colors bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-slate-500">
@@ -582,7 +582,7 @@ export default function HostManagePage() {
                               <span className="text-xs text-slate-500 px-3 py-1.5">Team: {sub.teamName}</span>
                             </div>
                           </div>
-                          
+
                           {sub.submissionStatus !== "DISQUALIFIED" && (
                             <button onClick={() => handleDisqualify(sub.id)} className="shrink-0 text-xs font-semibold text-red-400 hover:text-red-300 transition-colors bg-red-900/20 px-3 py-2 rounded-lg border border-red-900/50 hover:border-red-500/50">
                               Disqualify
@@ -603,8 +603,8 @@ export default function HostManagePage() {
                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                   <div className="grid md:grid-cols-2 gap-6 items-start">
                     {/* Left: Form */}
-                    <EvaluationCriteriaForm 
-                      hackathonId={id} 
+                    <EvaluationCriteriaForm
+                      hackathonId={id}
                       initialData={editingCriteria}
                       onSuccess={() => {
                         setEditingCriteria(null);
@@ -612,7 +612,7 @@ export default function HostManagePage() {
                       }}
                       onCancel={() => setEditingCriteria(null)}
                     />
-                    
+
                     {/* Right: List of Criteria */}
                     <div className="rounded-2xl border border-slate-800 bg-slate-900 overflow-hidden flex flex-col h-full">
                       <div className="bg-slate-800/50 px-6 py-4 border-b border-slate-800 flex items-center justify-between">
