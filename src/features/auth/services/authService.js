@@ -64,7 +64,7 @@ export async function registerUser({ email, password, role }) {
     });
     return response.data.data; // { id, email, role, ... }
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Registration failed.");
+    throw new Error(error.response?.data?.message || "Registration failed.", { cause: error });
   }
 }
 
@@ -75,7 +75,7 @@ export async function verifyOtp(email, otpCode) {
     if (token) saveToken(token);
     return response.data.data; // { token, expiresIn }
   } catch (error) {
-    throw new Error(error.response?.data?.message || "OTP verification failed.");
+    throw new Error(error.response?.data?.message || "OTP verification failed.", { cause: error });
   }
 }
 
@@ -86,7 +86,7 @@ export async function loginUser(email, password) {
     if (token) saveToken(token);
     return response.data.data; // { token, expiresIn }
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Invalid email or password.");
+    throw new Error(error.response?.data?.message || "Invalid email or password.", { cause: error });
   }
 }
 
@@ -96,7 +96,7 @@ export async function fetchUserProfile() {
     const response = await api.get("/api/profiles/me");
     return response.data?.data || response.data;
   } catch (error) {
-    throw new Error("Failed to fetch user profile.");
+    throw new Error("Failed to fetch user profile.", { cause: error });
   }
 }
 
@@ -104,7 +104,7 @@ export async function resendOtp(email) {
   try {
     await api.post("/auth/resend", { email });
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to resend OTP.");
+    throw new Error(error.response?.data?.message || "Failed to resend OTP.", { cause: error });
   }
 }
 

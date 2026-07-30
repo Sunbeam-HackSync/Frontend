@@ -10,7 +10,7 @@ export async function createHackathon(formData) {
     const response = await api.post("/host/hackathon/create", formData);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to create hackathon.");
+    throw new Error(error.response?.data?.message || "Failed to create hackathon.", { cause: error });
   }
 }
 
@@ -20,7 +20,7 @@ export async function getHostHackathons() {
     const response = await api.get("/host/me");
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch your hackathons.");
+    throw new Error(error.response?.data?.message || "Failed to fetch your hackathons.", { cause: error });
   }
 }
 
@@ -30,7 +30,7 @@ export async function getHostHackathonDetails() {
     const response = await api.get("/host/me/hackathons/details");
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch your hackathons details.");
+    throw new Error(error.response?.data?.message || "Failed to fetch your hackathons details.", { cause: error });
   }
 }
 
@@ -40,7 +40,7 @@ export async function getHostHackathonById(id) {
     const response = await api.get(`/host/hackathon/${id}`);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch hackathon details.");
+    throw new Error(error.response?.data?.message || "Failed to fetch hackathon details.", { cause: error });
   }
 }
 
@@ -50,7 +50,7 @@ export async function updateHackathon(id, data) {
     const response = await api.put(`/host/hackathon/${id}`, data);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to update hackathon.");
+    throw new Error(error.response?.data?.message || "Failed to update hackathon.", { cause: error });
   }
 }
 
@@ -62,7 +62,7 @@ export async function inviteJudge(hackathonId, email) {
     const response = await api.post(`/host/hackathon/${hackathonId}/judges`, { email });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to add judge.");
+    throw new Error(error.response?.data?.message || "Failed to add judge.", { cause: error });
   }
 }
 
@@ -72,7 +72,7 @@ export async function inviteMentor(hackathonId, email) {
     const response = await api.post(`/host/hackathon/${hackathonId}/mentors`, { email });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to add mentor.");
+    throw new Error(error.response?.data?.message || "Failed to add mentor.", { cause: error });
   }
 }
 
@@ -84,7 +84,7 @@ export async function publishHackathonResults(id) {
     const response = await api.put(`/host/hackathon/${id}/publish`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to publish results.");
+    throw new Error(error.response?.data?.message || "Failed to publish results.", { cause: error });
   }
 }
 
@@ -96,7 +96,7 @@ export async function getHackathonParticipants(id) {
     const response = await api.get(`/host/hackathon/${id}/participants`);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch participants.");
+    throw new Error(error.response?.data?.message || "Failed to fetch participants.", { cause: error });
   }
 }
 
@@ -106,7 +106,7 @@ export async function getHackathonSubmissions(id) {
     const response = await api.get(`/host/hackathon/${id}/submissions`);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch submissions.");
+    throw new Error(error.response?.data?.message || "Failed to fetch submissions.", { cause: error });
   }
 }
 
@@ -118,7 +118,7 @@ export async function getEvaluationCriteria(hackathonId) {
     const response = await api.get(`/host/hackathon/${hackathonId}/criteria`);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch evaluation criteria.");
+    throw new Error(error.response?.data?.message || "Failed to fetch evaluation criteria.", { cause: error });
   }
 }
 
@@ -128,7 +128,7 @@ export async function createEvaluationCriteria(hackathonId, data) {
     const response = await api.post(`/host/hackathon/${hackathonId}/evaluation-criteria`, data);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to create evaluation criteria.");
+    throw new Error(error.response?.data?.message || "Failed to create evaluation criteria.", { cause: error });
   }
 }
 
@@ -138,7 +138,7 @@ export async function updateEvaluationCriteria(hackathonId, criteriaId, data) {
     const response = await api.put(`/host/hackathon/${hackathonId}/evaluation-criteria/${criteriaId}`, data);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to update evaluation criteria.");
+    throw new Error(error.response?.data?.message || "Failed to update evaluation criteria.", { cause: error });
   }
 }
 
@@ -150,7 +150,7 @@ export async function disqualifySubmission(hackathonId, submissionId) {
     const response = await api.put(`/host/hackathon/${hackathonId}/submissions/${submissionId}/disqualify`);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to disqualify submission.");
+    throw new Error(error.response?.data?.message || "Failed to disqualify submission.", { cause: error });
   }
 }
 
@@ -162,6 +162,6 @@ export async function assignSuperJudge(hackathonId, judgeEmail) {
     const response = await api.put(`/host/hackathon/${hackathonId}/judges/${judgeEmail}/assign-super-judge`);
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to assign super judge.");
+    throw new Error(error.response?.data?.message || "Failed to assign super judge.", { cause: error });
   }
 }

@@ -10,7 +10,7 @@ export async function getDiscoveryFeed(page = 0, size = 10) {
         const response = await api.get("/participants/hackathons", { params: { page, size } });
         return response.data.data; // Page object: { content, totalPages, totalElements, ... }
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch hackathons.");
+        throw new Error(error.response?.data?.message || "Failed to fetch hackathons.", { cause: error });
     }
 }
 

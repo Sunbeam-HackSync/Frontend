@@ -10,7 +10,7 @@ export async function getDiscoveryFeed(page = 0, size = 10) {
     const response = await api.get("/participants/hackathons", { params: { page, size } });
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch hackathons.");
+    throw new Error(error.response?.data?.message || "Failed to fetch hackathons.", { cause: error });
   }
 }
 
@@ -20,7 +20,7 @@ export async function getParticipantHackathonById(id) {
     const response = await api.get(`/participants/${id}`);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to fetch hackathon.");
+    throw new Error(error.response?.data?.message || "Failed to fetch hackathon.", { cause: error });
   }
 }
 
@@ -32,7 +32,7 @@ export async function createTeam(data) {
     const response = await api.post("/participants/createTeam", data);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to create team.");
+    throw new Error(error.response?.data?.message || "Failed to create team.", { cause: error });
   }
 }
 
@@ -42,7 +42,7 @@ export async function joinTeam(id, data) {
     const response = await api.post(`/participants/teams/${id}/join`, data);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to join team.");
+    throw new Error(error.response?.data?.message || "Failed to join team.", { cause: error });
   }
 }
 
@@ -76,7 +76,7 @@ export async function submitProject(data) {
     const response = await api.post("/participants/submitProject", data);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to submit project.");
+    throw new Error(error.response?.data?.message || "Failed to submit project.", { cause: error });
   }
 }
 
@@ -86,8 +86,7 @@ export async function getMySubmission(hackathonId) {
     const response = await api.get(`/participants/hackathons/${hackathonId}/submission/me`);
     return response.data.data;
   } catch (error) {
-    console.warn("getMySubmission: endpoint not available", error.response?.status);
-    return null;
+    throw new Error(error.response?.data?.message || "Failed to fetch submission.", { cause: error });
   }
 }
 
@@ -97,6 +96,6 @@ export async function createHelpTicket(data) {
     const response = await api.post("/participants/helpTickets", data);
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Failed to create help ticket.");
+    throw new Error(error.response?.data?.message || "Failed to create help ticket.", { cause: error });
   }
 }
