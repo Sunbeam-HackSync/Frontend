@@ -1,9 +1,9 @@
 // src/features/participant/pages/ParticipantDashboardPage.jsx
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { toast } from "react-toastify";
-import { FaCalendarAlt, FaArrowRight, FaRocket, FaSearch, FaUserCircle } from "react-icons/fa";
+import { FaCalendarAlt, FaArrowRight, FaRocket, FaSearch } from "react-icons/fa";
 
 import { getMyHackathons } from "../services/participantService";
 import Navbar from "../../../components/layout/Navbar";
@@ -133,7 +133,6 @@ function EmptyState() {
 export default function ParticipantDashboardPage() {
     const [hackathons, setHackathons] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const navigate = useNavigate();
 
     useEffect(() => {
         getMyHackathons()

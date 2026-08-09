@@ -120,7 +120,7 @@ function fmtDate(value) {
 
 // ─── Evaluation Criteria Form ──────────────────────────────────────────────────
 function EvaluationCriteriaForm({ hackathonId, initialData, onSuccess, onCancel }) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset } = useForm();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -256,7 +256,9 @@ export default function HostManagePage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     load();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   async function handlePublish() {

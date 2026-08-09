@@ -76,6 +76,7 @@ export default function MentorDashboardPage() {
       const data = await getMyAssignedHackathons();
       setHackathons(Array.isArray(data) ? data : []);
     } catch (err) {
+      console.error(err);
       toast.error("Failed to load mentor assignments");
     } finally {
       setIsLoading(false);
@@ -83,6 +84,7 @@ export default function MentorDashboardPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, []);
 

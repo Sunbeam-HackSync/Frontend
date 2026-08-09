@@ -270,8 +270,8 @@ export function ParticipantHelpPage() {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {tickets.map((t) => (
-                                    <TicketCard key={t.ticketId || Math.random()} ticket={t} />
+                                {tickets.map((t, index) => (
+                                    <TicketCard key={t.ticketId || `ticket-${index}`} ticket={t} />
                                 ))}
                             </div>
                         )}

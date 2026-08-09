@@ -56,7 +56,7 @@ function validateStep(step, formData) {
 export default function HostHackathonPage() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { step, totalSteps, formData, isSubmitting } = useSelector((s) => s.host);
+    const { step, totalSteps, formData } = useSelector((s) => s.host);
 
     function handleNext() {
         const errors = validateStep(step, formData);
@@ -99,7 +99,7 @@ export default function HostHackathonPage() {
                 rules: formData.rules.trim()
             };
 
-            const hackathon = await createHackathon(payload);
+            await createHackathon(payload);
             toast.success("Hackathon created! Pending admin approval.");
             dispatch(resetForm());
             navigate(`/host-dashboard`);

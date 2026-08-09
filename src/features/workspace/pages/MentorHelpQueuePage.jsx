@@ -65,7 +65,7 @@ export function MentorHelpQueuePage() {
   async function handleClaim(ticketId) {
     try {
       setActionLoading(ticketId);
-      const updated = await claimTicket(ticketId);
+      await claimTicket(ticketId);
       setTickets((prev) =>
         prev.map((t) => (t.id === ticketId ? { ...t, status: "CLAIMED" } : t))
       );

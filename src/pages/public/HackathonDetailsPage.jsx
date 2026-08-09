@@ -27,6 +27,7 @@ export default function HackathonDetailsPage() {
         const data = await getParticipantHackathonById(id);
         setHackathon(data);
       } catch (err) {
+        console.error("Error fetching hackathon details:", err);
         setError("Failed to load hackathon details.");
       } finally {
         setLoading(false);

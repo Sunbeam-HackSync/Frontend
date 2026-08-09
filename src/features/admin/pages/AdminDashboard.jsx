@@ -106,8 +106,11 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadMetrics();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadPending();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleApprove(id) {

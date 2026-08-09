@@ -8,8 +8,8 @@ const ChatMessage = ({ message }) => {
 
     // Custom renderers for markdown elements to make them look beautiful and fit the theme
     const markdownComponents = {
-        p: ({ node, ...props }) => <p className="mb-3 last:mb-0" {...props} />,
-        a: ({ node, ...props }) => (
+        p: ({ ...props }) => <p className="mb-3 last:mb-0" {...props} />,
+        a: ({ ...props }) => (
             <a 
                 className="font-medium underline underline-offset-4 hover:opacity-80 transition-opacity" 
                 target="_blank" 
@@ -17,33 +17,36 @@ const ChatMessage = ({ message }) => {
                 {...props} 
             />
         ),
-        ul: ({ node, ...props }) => <ul className="mb-4 list-outside list-disc pl-5 last:mb-0 space-y-1.5" {...props} />,
-        ol: ({ node, ...props }) => <ol className="mb-4 list-outside list-decimal pl-5 last:mb-0 space-y-1.5" {...props} />,
-        li: ({ node, ...props }) => <li className="leading-relaxed" {...props} />,
-        strong: ({ node, ...props }) => <strong className="font-semibold" {...props} />,
-        table: ({ node, ...props }) => (
+        ul: ({ ...props }) => <ul className="mb-4 list-outside list-disc pl-5 last:mb-0 space-y-1.5" {...props} />,
+        ol: ({ ...props }) => <ol className="mb-4 list-outside list-decimal pl-5 last:mb-0 space-y-1.5" {...props} />,
+        li: ({ ...props }) => <li className="leading-relaxed" {...props} />,
+        strong: ({ ...props }) => <strong className="font-semibold" {...props} />,
+        table: ({ ...props }) => (
             <div className="my-4 overflow-x-auto rounded-xl border border-gray-200/50 shadow-sm dark:border-gray-700/50">
                 <table className="w-full border-collapse text-left text-sm" {...props} />
             </div>
         ),
-        thead: ({ node, ...props }) => <thead className="bg-black/5 dark:bg-white/5" {...props} />,
-        th: ({ node, ...props }) => <th className="border-b border-gray-200/50 px-4 py-3 font-semibold dark:border-gray-700/50" {...props} />,
-        td: ({ node, ...props }) => <td className="border-b border-gray-100/50 px-4 py-3 last:border-0 dark:border-gray-700/30" {...props} />,
-        h1: ({ node, ...props }) => <h1 className="mb-4 mt-6 text-2xl font-bold tracking-tight first:mt-0" {...props} />,
-        h2: ({ node, ...props }) => <h2 className="mb-3 mt-5 text-xl font-bold tracking-tight first:mt-0" {...props} />,
-        h3: ({ node, ...props }) => <h3 className="mb-3 mt-4 text-lg font-bold tracking-tight first:mt-0" {...props} />,
-        blockquote: ({ node, ...props }) => (
+        thead: ({ ...props }) => <thead className="bg-black/5 dark:bg-white/5" {...props} />,
+        th: ({ ...props }) => <th className="border-b border-gray-200/50 px-4 py-3 font-semibold dark:border-gray-700/50" {...props} />,
+        td: ({ ...props }) => <td className="border-b border-gray-100/50 px-4 py-3 last:border-0 dark:border-gray-700/30" {...props} />,
+        h1: ({ ...props }) => <h1 className="mb-4 mt-6 text-2xl font-bold tracking-tight first:mt-0" {...props} />,
+        h2: ({ ...props }) => <h2 className="mb-3 mt-5 text-xl font-bold tracking-tight first:mt-0" {...props} />,
+        h3: ({ ...props }) => <h3 className="mb-3 mt-4 text-lg font-bold tracking-tight first:mt-0" {...props} />,
+        blockquote: ({ ...props }) => (
             <blockquote className="my-4 border-l-4 border-indigo-500/50 pl-4 text-inherit opacity-80 italic" {...props} />
         ),
         code(props) {
-            const { children, className, node, ...rest } = props;
+            const { children, className, ...rest } = props;
+            // eslint-disable-next-line no-unused-vars
+            const { node, ...cleanRest } = rest;
+            
             const match = /language-(\w+)/.exec(className || "");
             const isInline = !match && !String(children).includes("\n");
             
             return isInline ? (
                 <code 
                     className="rounded-md bg-black/10 px-1.5 py-0.5 font-mono text-[13px] text-inherit dark:bg-white/10" 
-                    {...rest}
+                    {...cleanRest}
                 >
                     {children}
                 </code>
@@ -53,7 +56,7 @@ const ChatMessage = ({ message }) => {
                         {match ? match[1] : "text"}
                     </div>
                     <pre className="overflow-x-auto p-4 font-mono text-[13px] leading-relaxed text-gray-50">
-                        <code className={className} {...rest}>
+                        <code className={className} {...cleanRest}>
                             {children}
                         </code>
                     </pre>

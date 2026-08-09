@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useOutletContext, Link } from "react-router";
-import { FaCalendarAlt, FaUsers, FaShieldAlt, FaArrowRight, FaPlusCircle } from "react-icons/fa";
+import { FaUsers, FaShieldAlt, FaArrowRight, FaPlusCircle } from "react-icons/fa";
 
 import { getMyHackathonDetails, getHackathonResult, getHackathonWinners } from "../../participant/services/participantService";
 import { FaTrophy, FaMedal } from "react-icons/fa";
@@ -172,7 +172,6 @@ function ParticipantOverview({ hackathon, details, result }) {
 
 // ─── Organizer overview ───────────────────────────────────────────────────────
 function OrganizerOverview({ hackathon }) {
-    const { id } = useParams();
     return (
         <div className="space-y-6">
             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
@@ -254,6 +253,7 @@ export function WorkspaceOverviewPage() {
 
     useEffect(() => {
         if (role === "PARTICIPANT") {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsLoading(true);
             Promise.allSettled([
                 getMyHackathonDetails(id),

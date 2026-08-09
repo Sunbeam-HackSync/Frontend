@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Link, useSearchParams } from "react-router";
 
-import Badge from "../../features/workspace/components/Badge";
 import PageHeader from "../../features/workspace/components/PageHeader";
 import Button from "../../components/ui/Button";
 import Container from "../../components/common/Container";

@@ -34,13 +34,14 @@ export default function MentorWorkspacePage() {
     }, []);
 
     useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setIsLoading(true);
         fetchTickets().finally(() => setIsLoading(false));
 
         // Connect to WebSocket
         webSocketService.connect(() => {
             // Subscribe to global tickets topic
-            webSocketService.subscribe('/topic/tickets', (message) => {
+            webSocketService.subscribe('/topic/tickets', () => {
                 // Add a small delay to ensure backend DB transaction has committed
                 setTimeout(() => {
                     fetchTickets();

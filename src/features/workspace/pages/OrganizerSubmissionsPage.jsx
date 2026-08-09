@@ -22,6 +22,7 @@ export function OrganizerSubmissionsPage() {
         // data should be an array of submissions
         setSubmissions(data || []);
       } catch (err) {
+        console.error(err);
         setError("Failed to load submissions.");
       } finally {
         setLoading(false);
@@ -50,10 +51,10 @@ export function OrganizerSubmissionsPage() {
         {submissions.length === 0 ? (
           <p className="text-slate-400">No submissions found.</p>
         ) : (
-          submissions.map((submission) => {
+          submissions.map((submission, index) => {
             return (
               <Panel
-                key={submission.submissionId || Math.random()}
+                key={submission.submissionId || `sub-${index}`}
                 title={submission.projectName || "Untitled Project"}
                 description={submission.description || "No description provided"}
                 actions={<Badge>{submission.status || "SUBMITTED"}</Badge>}

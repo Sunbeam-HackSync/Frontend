@@ -24,6 +24,7 @@ export function OrganizerParticipantsPage() {
         // data should be an array of ParticipantResponseDTO
         setParticipants(data || []);
       } catch (err) {
+        console.error(err);
         setError("Failed to load participants.");
       } finally {
         setLoading(false);
@@ -63,9 +64,9 @@ export function OrganizerParticipantsPage() {
           {participants.length === 0 ? (
             <p className="text-slate-400">No participants found.</p>
           ) : (
-            participants.map((participant) => (
+            participants.map((participant, index) => (
               <div
-                key={participant.userId || Math.random()}
+                key={participant.userId || `part-${index}`}
                 className="flex flex-col gap-4 rounded-lg border border-slate-800 bg-slate-950 p-4 lg:flex-row lg:items-center lg:justify-between"
               >
                 <PersonRow

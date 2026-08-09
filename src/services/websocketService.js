@@ -79,7 +79,7 @@ class WebSocketService {
                 try {
                     const parsed = JSON.parse(message.body);
                     callback(parsed);
-                } catch (e) {
+                } catch {
                     callback(message.body);
                 }
             }

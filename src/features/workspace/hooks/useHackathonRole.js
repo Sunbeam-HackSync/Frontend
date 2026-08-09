@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
 
+// eslint-disable-next-line no-unused-vars
 export default function useHackathonRole(hackathonId) {
     const { user, platformRoles } = useSelector((state) => state.auth);
 

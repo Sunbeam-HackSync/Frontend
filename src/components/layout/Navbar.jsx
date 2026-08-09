@@ -80,7 +80,7 @@ export default function Navbar({ hideLinks = false }) {
     const [isOpen, setIsOpen] = useState(false);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { isAuthenticated, user, platformRoles } = useSelector((state) => state.auth);
+    const { isAuthenticated, platformRoles } = useSelector((state) => state.auth);
 
     const navLinks = [
         {

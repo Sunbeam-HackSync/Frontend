@@ -18,6 +18,7 @@ export default function JudgeHackathonDetailsPage() {
 
     useEffect(() => {
         loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     async function loadData() {
@@ -26,6 +27,7 @@ export default function JudgeHackathonDetailsPage() {
             const data = await getHackathonById(id);
             setHackathon(data);
         } catch (error) {
+            console.error(error);
             toast.error("Failed to load hackathon details.");
             navigate("/judge-dashboard");
         } finally {
@@ -40,6 +42,7 @@ export default function JudgeHackathonDetailsPage() {
             toast.success(`Invitation ${status.toLowerCase()} successfully`);
             loadData();
         } catch (err) {
+            console.error(err);
             toast.error("Failed to update invitation status");
         } finally {
             setUpdating(false);

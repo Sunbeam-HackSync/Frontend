@@ -251,6 +251,7 @@ export function ParticipantTeamPage() {
         }
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/set-state-in-effect
     useEffect(() => { loadDetails(); }, [id]);
 
     const teamDetails = details?.teamDetails;

@@ -1,10 +1,10 @@
 // src/features/judge/pages/JudgeDashboardPage.jsx
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { getMyAssignedHackathons, updateInvitationStatus } from "../services/judgeService";
-import { FaGavel, FaCheck, FaTimes } from "react-icons/fa";
+import { getMyAssignedHackathons } from "../services/judgeService";
+import { FaGavel } from "react-icons/fa";
 import Navbar from "../../../components/layout/Navbar";
 
 function fmtDate(value) {
@@ -12,7 +12,7 @@ function fmtDate(value) {
   return new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-function JudgeHackathonCard({ hackathon, onStatusUpdate }) {
+function JudgeHackathonCard({ hackathon }) {
   const navigate = useNavigate();
   const isPending = hackathon.invitationStatus === "INVITED" || hackathon.invitationStatus === "PENDING";
   const isAccepted = hackathon.invitationStatus === "ACCEPTED";
@@ -84,6 +84,7 @@ export default function JudgeDashboardPage() {
       const data = await getMyAssignedHackathons();
       setHackathons(Array.isArray(data) ? data : []);
     } catch (err) {
+      console.error(err);
       toast.error("Failed to load judge assignments");
     } finally {
       setIsLoading(false);
@@ -91,6 +92,7 @@ export default function JudgeDashboardPage() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData();
   }, []);
 
@@ -127,7 +129,7 @@ export default function JudgeDashboardPage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {hackathons.map((h) => (
-              <JudgeHackathonCard key={h.hackathonId} hackathon={h} onStatusUpdate={loadData} />
+              <JudgeHackathonCard key={h.hackathonId} hackathon={h} />
             ))}
           </div>
         )}

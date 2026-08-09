@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { useOutletContext } from "react-router";
 import { FaBullhorn, FaRegClock } from "react-icons/fa";
 
 import api from "../../../services/api";
@@ -69,6 +68,7 @@ export function OrganizerAnnouncementsPage() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
+      console.error(err);
       setError("Failed to publish announcement.");
     } finally {
       setSubmitting(false);

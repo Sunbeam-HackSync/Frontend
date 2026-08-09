@@ -23,6 +23,7 @@ export default function MentorHackathonDetailsPage() {
 
     useEffect(() => {
         loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     async function loadData() {
@@ -39,6 +40,7 @@ export default function MentorHackathonDetailsPage() {
                 setMentorStatus(myAssignment);
             }
         } catch (error) {
+            console.error(error);
             toast.error("Failed to load hackathon details.");
             navigate("/mentor-dashboard");
         } finally {
@@ -53,6 +55,7 @@ export default function MentorHackathonDetailsPage() {
             toast.success(`Invitation ${status.toLowerCase()} successfully`);
             loadData();
         } catch (err) {
+            console.error(err);
             toast.error("Failed to update invitation status");
         } finally {
             setUpdating(false);
@@ -74,7 +77,6 @@ export default function MentorHackathonDetailsPage() {
 
     const isPending = mentorStatus.invitationStatus === "INVITED" || mentorStatus.invitationStatus === "PENDING";
     const isAccepted = mentorStatus.invitationStatus === "ACCEPTED";
-    const isDeclined = mentorStatus.invitationStatus === "DECLINED" || mentorStatus.invitationStatus === "REJECTED";
 
     return (
         <>
