@@ -56,7 +56,7 @@ export default function HeroSection() {
                                 mb-6
                             "
                         >
-                            🚀 Next Generation Hackathon Platform
+                            🚀 Next Generation Hackathon Platform -
                         </p>
 
                         <h1
