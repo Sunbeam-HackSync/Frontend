@@ -20,7 +20,7 @@ export async function getHackathonById(id) {
         const response = await api.get(`/participants/${id}`);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch hackathon.");
+        throw new Error(error.response?.data?.message || "Failed to fetch hackathon.", { cause: error });
     }
 }
 
@@ -32,7 +32,7 @@ export async function getMyHackathons() {
         const response = await api.get("/participants/my-hackathons");
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch your hackathons.");
+        throw new Error(error.response?.data?.message || "Failed to fetch your hackathons.", { cause: error });
     }
 }
 
@@ -45,7 +45,7 @@ export async function getMyHackathonDetails(hackathonId) {
         const response = await api.get(`/participants/hackathons/${hackathonId}/my-details`);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch hackathon details.");
+        throw new Error(error.response?.data?.message || "Failed to fetch hackathon details.", { cause: error });
     }
 }
 
@@ -58,7 +58,7 @@ export async function createTeam(data) {
         const response = await api.post("/participants/createTeam", data);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to create team.");
+        throw new Error(error.response?.data?.message || "Failed to create team.", { cause: error });
     }
 }
 
@@ -68,7 +68,7 @@ export async function addMember(teamId, email) {
         const response = await api.post(`/participants/teams/${teamId}/join`, { email });
         return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to add member.");
+        throw new Error(error.response?.data?.message || "Failed to add member.", { cause: error });
     }
 }
 
@@ -78,7 +78,7 @@ export async function getTeamDetails(teamId) {
         const response = await api.get(`/participants/teams/${teamId}`);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch team details.");
+        throw new Error(error.response?.data?.message || "Failed to fetch team details.", { cause: error });
     }
 }
 
@@ -89,7 +89,7 @@ export async function updateTeam(teamId, data) {
         const response = await api.put(`/participants/teams/${teamId}`, data);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to update team.");
+        throw new Error(error.response?.data?.message || "Failed to update team.", { cause: error });
     }
 }
 
@@ -102,7 +102,7 @@ export async function createHelpTicket(data) {
         const response = await api.post("/participants/helpTickets", data);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to create help ticket.");
+        throw new Error(error.response?.data?.message || "Failed to create help ticket.", { cause: error });
     }
 }
 
@@ -112,8 +112,8 @@ export async function getMyTickets(hackathonId, teamId) {
         const response = await api.get(`/participants/tickets/${hackathonId}/${teamId}`);
         return response.data.data;
     } catch (error) {
-        console.warn("getMyTickets:", error.response?.status, error.response?.data?.message);
-        return [];
+        throw new Error(error.response?.data?.message || "Failed to fetch help tickets.", { cause: error });
+        
     }
 }
 
@@ -126,7 +126,7 @@ export async function submitProject(data) {
         const response = await api.post("/participants/submissions", data);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to submit project.");
+        throw new Error(error.response?.data?.message || "Failed to submit project.", { cause: error });
     }
 }
 
@@ -139,7 +139,7 @@ export async function getProfile() {
         return response.data.data;
     } catch (error) {
         if (error.response?.status === 404) return null;
-        throw new Error(error.response?.data?.message || "Failed to fetch profile.");
+        throw new Error(error.response?.data?.message || "Failed to fetch profile.", { cause: error });
     }
 }
 
@@ -149,7 +149,7 @@ export async function createProfile(data) {
         const response = await api.post("/participants/profile", data);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to create profile.");
+        throw new Error(error.response?.data?.message || "Failed to create profile.", { cause: error });
     }
 }
 
@@ -159,7 +159,7 @@ export async function updateProfile(data) {
         const response = await api.put("/participants/profile", data);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to update profile.");
+        throw new Error(error.response?.data?.message || "Failed to update profile.", { cause: error });
     }
 }
 
@@ -171,7 +171,7 @@ export async function getHackathonResult(hackathonId) {
         const response = await api.get(`/participants/hackathon/${hackathonId}/result`);
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch result.");
+        throw new Error(error.response?.data?.message || "Failed to fetch result.", { cause: error });
     }
 }
 
@@ -183,6 +183,6 @@ export async function getHackathonWinners(hackathonId) {
 
         return response.data.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch winners.");
+        throw new Error(error.response?.data?.message || "Failed to fetch winners.", { cause: error });
     }
 }

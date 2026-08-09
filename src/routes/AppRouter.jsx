@@ -19,7 +19,6 @@ import RegisterPage from "../features/auth/pages/RegisterPage";
 // ── Route guards ──────────────────────────────────────────────────────────────
 import ProtectedRoute from "./ProtectedRoute";
 import PublicOnlyRoute from "./PublicOnlyRoute";
-import AdminRoute from "./AdminRoute";
 import RoleRoute from "./RoleRoute";
 
 // ── Admin feature ─────────────────────────────────────────────────────────────
@@ -52,9 +51,11 @@ import { MentorHelpQueuePage } from "../features/workspace/pages/MentorHelpQueue
 import { ParticipantTeamPage } from "../features/workspace/pages/ParticipantTeamPage";
 import { ParticipantSubmissionPage } from "../features/workspace/pages/ParticipantSubmissionPage";
 import { ParticipantHelpPage } from "../features/workspace/pages/ParticipantHelpPage";
+import Chatbot from "../features/agent/components/Chatbot";
+
+
 
 const router = createBrowserRouter([
-
     // ── Public routes ──────────────────────────────────────────────────────────
     {
         path: "/",
@@ -65,6 +66,7 @@ const router = createBrowserRouter([
             { path: "about", element: <AboutPage /> },
             { path: "hackathons", element: <HackathonsPage /> },
             { path: "hackathons/:id", element: <HackathonDetailsPage /> },
+            { path: "chatbot", element: <Chatbot /> },
         ],
     },
 
@@ -87,7 +89,7 @@ const router = createBrowserRouter([
     // ── Admin routes ───────────────────────────────────────────────────────────
     {
         path: "/admin",
-        element: <AdminRoute><AdminDashboard /></AdminRoute>,
+        element: <RoleRoute allowedRoles={["ADMIN"]}> <AdminDashboard /> </RoleRoute>,
     },
 
     // ── Host routes ────────────────────────────────────────────────────────────
