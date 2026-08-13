@@ -15,12 +15,13 @@ export default function ChatbotFAB() {
     const isChatbotPage = location.pathname === "/chatbot";
 
     useEffect(() => {
+        let t;
         if (isChatbotPage) {
-            setVisible(false);
-            return;
+            t = setTimeout(() => setVisible(false), 0);
+        } else {
+            // Short delay so the button "slides up" after page transition
+            t = setTimeout(() => setVisible(true), 300);
         }
-        // Short delay so the button "slides up" after page transition
-        const t = setTimeout(() => setVisible(true), 300);
         return () => clearTimeout(t);
     }, [isChatbotPage]);
 

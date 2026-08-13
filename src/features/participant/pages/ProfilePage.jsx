@@ -143,6 +143,7 @@ export default function ProfilePage() {
         formState: { errors, isSubmitting },
     } = useForm({ resolver: zodResolver(profileSchema) });
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const avatarURL = watch("avatarURL");
 
     // Load existing profile on mount
