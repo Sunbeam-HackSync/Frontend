@@ -1,6 +1,6 @@
 // src/routes/AppRouter.jsx
 
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router";
 
 import PublicLayout from "../layouts/PublicLayout";
 import AuthLayout from "../layouts/AuthLayout";
@@ -52,10 +52,23 @@ import { ParticipantTeamPage } from "../features/workspace/pages/ParticipantTeam
 import { ParticipantSubmissionPage } from "../features/workspace/pages/ParticipantSubmissionPage";
 import { ParticipantHelpPage } from "../features/workspace/pages/ParticipantHelpPage";
 import Chatbot from "../features/agent/components/Chatbot";
+import ChatbotFAB from "../components/ui/ChatbotFAB";
 
-
+// ── Root layout: wraps every route so ChatbotFAB has router context ────────────
+function RootLayout() {
+    return (
+        <>
+            <Outlet />
+            <ChatbotFAB />
+        </>
+    );
+}
 
 const router = createBrowserRouter([
+    {
+        // Pathless root — provides router context to ChatbotFAB on every page
+        element: <RootLayout />,
+        children: [
     // ── Public routes ──────────────────────────────────────────────────────────
     {
         path: "/",
@@ -216,6 +229,8 @@ const router = createBrowserRouter([
             { path: "help-queue", element: <MentorHelpQueuePage /> },
         ],
     },
+    ],   // end of RootLayout children
+    },   // end of RootLayout route object
 ]);
 
 export default function AppRouter() {

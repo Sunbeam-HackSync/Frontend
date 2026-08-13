@@ -37,14 +37,32 @@ function validateStep(step, formData) {
         if (!formData.hackathonEnd) errors.hackathonEnd = "Hackathon end is required.";
         if (!formData.resultDeclarationDate) errors.resultDeclarationDate = "Result declaration date is required.";
 
+        // Registration Opens must not be in the past
+        if (formData.registrationStart && formData.registrationStart < new Date().toISOString().slice(0, 16)) {
+            errors.registrationStart = "Registration Opens must be a future date and time.";
+        }
+
+        // Registration Closes must be after Registration Opens
         if (formData.registrationStart && formData.registrationEnd &&
             formData.registrationStart >= formData.registrationEnd) {
-            errors.registrationEnd = "Registration end must be after start.";
+            errors.registrationEnd = "Registration Closes must be after Registration Opens.";
         }
+        // Hackathon Starts must be after Registration Closes
+        if (formData.registrationEnd && formData.hackathonStart &&
+            formData.registrationEnd >= formData.hackathonStart) {
+            errors.hackathonStart = "Hackathon Starts must be after Registration Closes.";
+        }
+        // Hackathon Ends must be after Hackathon Starts
         if (formData.hackathonStart && formData.hackathonEnd &&
             formData.hackathonStart >= formData.hackathonEnd) {
-            errors.hackathonEnd = "Hackathon end must be after start.";
+            errors.hackathonEnd = "Hackathon Ends must be after Hackathon Starts.";
         }
+        // Result Declaration must be after Hackathon Ends
+        if (formData.hackathonEnd && formData.resultDeclarationDate &&
+            formData.hackathonEnd >= formData.resultDeclarationDate) {
+            errors.resultDeclarationDate = "Result Declaration Date must be after Hackathon Ends.";
+        }
+        // Team size
         if (formData.minTeamSize > formData.maxTeamSize) {
             errors.maxTeamSize = "Max team size must be ≥ min team size.";
         }
